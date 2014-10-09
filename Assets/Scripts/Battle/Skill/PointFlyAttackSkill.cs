@@ -19,8 +19,9 @@ public class PointFlyAttackSkill : Skill {
 	private SkillObject skillObject;
 
 	private float speed = 6f;
-
-	private Vector3 off = Vector2.zero;
+	
+	private Vector3 attackedOff = Vector2.zero;
+	private Vector3 attackOff = Vector2.zero;
 	
 	public PointFlyAttackSkill(Charactor attackOne , Charactor attackedOne , int effectId){
 		this.attackOne = attackOne;
@@ -29,7 +30,8 @@ public class PointFlyAttackSkill : Skill {
 		this.attackTransfrom = this.attackOne.transform;
 		this.attackedTransfrom = this.attackedOne.transform;
 
-		off = new Vector3((attackedOne.GetAttribute().volume/2.0f - 0.5f) * Constance.GRID_GAP , (attackedOne.GetAttribute().volume/2.0f - 0.5f) * Constance.GRID_GAP , 0);
+		attackOff = new Vector3((attackOne.GetAttribute().volume/2.0f - 0.5f) * Constance.GRID_GAP , (attackOne.GetAttribute().volume/2.0f - 0.5f) * Constance.GRID_GAP , 0);
+		attackedOff = new Vector3((attackedOne.GetAttribute().volume/2.0f - 0.5f) * Constance.GRID_GAP , (attackedOne.GetAttribute().volume/2.0f - 0.5f) * Constance.GRID_GAP , 0);
 	}
 	
 	public void Start(){
@@ -37,7 +39,7 @@ public class PointFlyAttackSkill : Skill {
 		GameObject gameObject = (GameObject)MonoBehaviour.Instantiate(SkillObject_pre);
 		
 		skillObject = gameObject.GetComponent<SkillObject>();
-		skillObject.transform.position = attackOne.transform.position;
+		skillObject.transform.position = attackOne.transform.position + attackOff;
 
 		skillTransfrom = skillObject.transform;
 
@@ -51,7 +53,7 @@ public class PointFlyAttackSkill : Skill {
 		}
 
 		float d1 = Time.deltaTime * speed;
-		float d2 = Vector3.Distance(skillTransfrom.position , attackedTransfrom.position + off);
+		float d2 = Vector3.Distance(skillTransfrom.position , attackedTransfrom.position + attackedOff);
 
 
 		if(d1 > d2){
@@ -73,13 +75,13 @@ public class PointFlyAttackSkill : Skill {
 		}
 
 		skillTransfrom.eulerAngles = new Vector3(0 , 0 , GetAngle()); 
-		skillTransfrom.position = Vector3.MoveTowards(skillTransfrom.position , attackedTransfrom.position + off , d1);
+		skillTransfrom.position = Vector3.MoveTowards(skillTransfrom.position , attackedTransfrom.position + attackedOff , d1);
 	}
 
 
 	private float GetAngle(){
 
-		return Mathf.Atan2(attackedTransfrom.position.y + off.y  - skillTransfrom.position.y , attackedTransfrom.position.x - skillTransfrom.position.x + off.y) * 180 / Mathf.PI ;
+		return Mathf.Atan2(attackedTransfrom.position.y + attackedOff.y  - skillTransfrom.position.y , attackedTransfrom.position.x - skillTransfrom.position.x + attackedOff.y) * 180 / Mathf.PI ;
 	}
 	
 	public bool IsEnd(){

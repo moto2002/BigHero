@@ -78,6 +78,10 @@ public class Hero : Charactor{
 		get{return _direction;}
 	}
 
+	private SkillConfig normalAttackSkill;
+
+	private ArrayList skills;
+
 
 	// Use this for initialization
 	void Start () {
@@ -112,6 +116,10 @@ public class Hero : Charactor{
 		attackRange.Add(new Vector2());
 		attackRange.Add(new Vector2());
 
+
+		skills = new ArrayList();
+
+		normalAttackSkill = Config.GetInstance().GetSkillCOnfig(0);
 	}
 	
 	// Update is called once per frame
@@ -282,38 +290,50 @@ public class Hero : Charactor{
 
 
 	private void TryAttak(){
+		NormalAttack();
+	}
 
+
+	private void NormalAttack(){
 		if(attackTagets.Count > 0){
 			this.model.PlayAttack();
 			this.attackCD = 0;
-
+			
 			while(attackTagets.Count > 0){
 				Charactor charactor = (Charactor)attackTagets.Dequeue();
-
-				SkillManager.PlaySkill(this , charactor , 1);
+				
+				SkillManager.PlaySkill(this , charactor, normalAttackSkill);
 			}
-
+			
 		}
-
+		
 		if(this.attackCD < 1){
 			this.attackCD += Time.deltaTime;
 			return;
 		}
-
-		ArrayList points  = AttRange.GetRange(AttRange.TYPE_RECT , 4 ,  this.attribute.volume , this.position);
-
+		
+		ArrayList points  = AttRange.GetRange(AttRange.TYPE_RECT , this.normalAttackSkill.range ,  this.attribute.volume , this.position);
+		
 		for(int i = 0 ; i < points.Count ; i++){
 			ArrayList monsters = Battle.GetMonstersByPoint((Vector2)points[i]);
-
+			
 			for(int j = 0 ; j < monsters.Count ; j++){
-
+				
 				if(attackTagets.Contains(monsters[j]) == false){
 					attackTagets.Enqueue(monsters[j]);
 				}
-
 			}
-
 		}
+	}
+
+
+
+	public void playSkill(int index){
+		this.attackCD = 0;
+
+		SkillConfig skillConfig = Config.GetInstance().GetSkillCOnfig(3);
+
+		SkillManager.PlaySkill(this , null , skillConfig);
 	}
 
 
@@ -482,9 +502,10 @@ public class Hero : Charactor{
 		return this.dead;
 	}
 
-	public MoveDirection GetDirection(){
+	public override MoveDirection GetDirection(){
 		return this.currentDirection;
 	}
+
 	
 	public override Attribute GetAttribute(){
 		return this.attribute;

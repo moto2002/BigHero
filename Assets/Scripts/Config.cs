@@ -20,10 +20,12 @@ public class Config {
 
 	private JsonData characterConfig;
 
+	private JsonData skillConfig;
 
 	public Config(){
 		grandConfig = JsonMapper.ToObject(Loader.GetText("Config/GroundConfig"));
 		characterConfig = JsonMapper.ToObject(Loader.GetText("Config/Character"));
+		skillConfig = JsonMapper.ToObject(Loader.GetText("Config/Skill"));
 	}
 
 
@@ -48,12 +50,37 @@ public class Config {
 		attribute.addatk = (int)elem["addatk"];
 		attribute.atk = (int)elem["atk"];
 		attribute.need = (int)elem["need"];
-		attribute.range = (int)elem["range"];
 		attribute.crit = (int)elem["crit"];
 		attribute.mod = (int)elem["mod"];
 		attribute.type = (int)elem["type"];
 		attribute.opennum = (int)elem["opennum"];
 
 		return attribute;
+	}
+
+	public SkillConfig GetSkillCOnfig(int id){
+
+		SkillConfig config = new SkillConfig();
+
+
+		for(int i = 0 ; i < skillConfig.Count ; i++){
+
+			JsonData skillJsonData = skillConfig[i] as JsonData;
+
+			if((int)skillJsonData["id"] == id){
+				config.id = (int)skillJsonData["id"];
+				config.attack_type = (int)skillJsonData["attack_type"];
+				config.desc = (string)skillJsonData["des"];
+				config.name = (string)skillJsonData["name"];
+				config.param1 = (int)skillJsonData["param1"];
+				config.param2 = (int)skillJsonData["param2"];
+				config.res = (int)skillJsonData["res"];
+				config.target = (int)skillJsonData["target"];
+				config.range  = (int)skillJsonData["range"];
+				break;
+			}
+		}
+
+		return config;
 	}
 }

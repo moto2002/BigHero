@@ -94,6 +94,15 @@ public class Battle : MonoBehaviour {
 
 	}
 
+
+	public void playSkill(){
+		if(hero == null){
+			return;
+		}
+
+		hero.playSkill(1);
+	}
+
 	public static void UpdatePosition(Charactor charactor , Vector2 position , int volume = 1){
 		
 		//	private static Dictionary<GameObject , ArrayList> objectPositionTable = new Dictionary<GameObject , ArrayList>();

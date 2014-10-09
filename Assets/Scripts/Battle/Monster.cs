@@ -41,8 +41,13 @@ public class Monster : Charactor{
 
 	private bool running = true;
 
+
+	private SkillConfig normalAttackSkill;
+
 	// Use this for initialization
 	void Start () {
+		this.normalAttackSkill = Config.GetInstance().GetSkillCOnfig(0);
+
 		this.charModel.direction = this.currentDirection;
 
 		this.attribute.volume = 2;
@@ -240,7 +245,7 @@ public class Monster : Charactor{
 			while(attackTagets.Count > 0){
 				Charactor charactor = (Charactor)attackTagets.Dequeue();
 				
-				SkillManager.PlaySkill(this , charactor , 1);
+				SkillManager.PlaySkill(this , charactor , normalAttackSkill);
 			}
 			
 		}
@@ -250,11 +255,9 @@ public class Monster : Charactor{
 			this.attackCD += Time.deltaTime;
 			return;
 		}
-		
-
 
 		
-		ArrayList points  = AttRange.GetRange(AttRange.TYPE_CORSS , this.attribute.range , this.attribute.volume, this.position);
+		ArrayList points  = AttRange.GetRange(AttRange.TYPE_CORSS , this.normalAttackSkill.range , this.attribute.volume, this.position);
 		
 		for(int i = 0 ; i < points.Count ; i++){
 			ArrayList followers = Battle.GetFollowersByPoint((Vector2)points[i]);

@@ -1,9 +1,5 @@
-{
-	"1":{
-		"name":"fireball",
-		"res":"fb",
-		"type":1,
-		"loop":true
-	}
-
-}
+[
+	{"id":0 , "attack_type":0 , "range":1 , "res":1 , "target":1 , "param1":0 , "param2":0 , "name":"普攻" , "des":"普攻"},
+	{"id":1 , "attack_type":2 , "range":0 , "res":1 , "target":1 , "param1":0 , "param2":0 , "name":"fireball" , "des":"火球"},
+	{"id":2 , "attack_type":2 , "range":0 , "res":1 , "target":1 , "param1":0 , "param2":0 , "name":"fireball" , "des":"大火球"}
+]

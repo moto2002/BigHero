@@ -7,8 +7,6 @@ public class Attribute  {
 
 	public int type;
 
-	public int range;
-
 	private float _maxHp;
 
 	public float maxHp{

@@ -25,15 +25,18 @@ public class SkillManager {
 		}
 	}
 
-	public static void PlaySkill(Charactor attack , Charactor attacked , int skillType , int effectId = 0){
+	public static void PlaySkill(Charactor attack , Charactor attacked , SkillConfig skillConfig){
 
 		Skill s = null;
-		switch(skillType){
+		switch(skillConfig.attack_type){
 		case TYPE_NORMAL_ATT:
 			s = new NormalAttackSkill(attack , attacked);
 			break;
 		case TYPE_POINT_FLYOBJECT_ATT:
-			s = new PointFlyAttackSkill(attack , attacked , effectId);
+			s = new PointFlyAttackSkill(attack , attacked , skillConfig.res);
+			break;
+		case TYPE_DIRECTIONI_FLYOBJECT_ATT:
+			s = new DirectionFlyAttackSkill(attack , skillConfig.res , skillConfig.range);
 			break;
 		}
 
