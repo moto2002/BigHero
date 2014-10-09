@@ -1,0 +1,9 @@
+{
+	"1":{
+		"name":"fireball",
+		"res":"fb",
+		"type":1,
+		"loop":true
+	}
+
+}

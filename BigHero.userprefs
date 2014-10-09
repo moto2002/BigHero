@@ -1,0 +1,64 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Battle/Skill/DirectionFlyAttackSkill.cs">
+    <Files>
+      <File FileName="Assets/Scripts/Battle/Charactor.cs" Line="8" Column="67" />
+      <File FileName="Assets/Scripts/CameraFollow.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Config.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/HpPop.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/SkillManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/NormalAttackSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/Skill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Follower.cs" Line="495" Column="1" />
+      <File FileName="Assets/Scripts/InputManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UIManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Monster.cs" Line="480" Column="3" />
+      <File FileName="Assets/Scripts/Battle/Skill/SkillObject.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/SkillConfig.cs" Line="1" Column="1" />
+      <File FileName="Assets/Plugins/FingerGestures/FingerGesturesInitializer.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/PointFlyAttackSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Hero.cs" Line="483" Column="3" />
+      <File FileName="Assets/Scripts/Battle/Skill/DirectionFlyAttackSkill.cs" Line="56" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Charactor.cs" Line="8" Column="43" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Assembly-CSharp" expanded="True">
+            <Node name="Scripts" expanded="True">
+              <Node name="Battle" expanded="True">
+                <Node name="Skill" expanded="True">
+                  <Node name="DirectionFlyAttackSkill.cs" selected="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node name="Assembly-CSharp-firstpass" expanded="True">
+            <Node name="Plugins" expanded="True">
+              <Node name="FingerGestures" expanded="True" />
+            </Node>
+          </Node>
+          <Node name="Assembly-UnityScript" expanded="True">
+            <Node name="FingerGestures" expanded="True">
+              <Node name="SkeletonCode" expanded="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>changeTime</Value>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/Users/Walker/Documents/BigHero/Assets/Scripts/Battle/Monster.cs" line="97" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
