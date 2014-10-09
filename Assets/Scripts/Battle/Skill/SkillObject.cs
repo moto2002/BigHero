@@ -16,4 +16,12 @@ public class SkillObject : MonoBehaviour {
 	void Update () {
 	
 	}
+
+	public void SetSpriteOff(Vector2 v){
+		spriteAnimation.transform.position = v;
+	}
+
+	public void SetSpriteEulerAngles(Vector3 v){
+		spriteAnimation.transform.eulerAngles = v;
+	}
 }

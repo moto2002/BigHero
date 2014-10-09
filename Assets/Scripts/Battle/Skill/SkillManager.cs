@@ -36,7 +36,7 @@ public class SkillManager {
 			s = new PointFlyAttackSkill(attack , attacked , skillConfig.res);
 			break;
 		case TYPE_DIRECTIONI_FLYOBJECT_ATT:
-			s = new DirectionFlyAttackSkill(attack , skillConfig.res , skillConfig.range);
+			s = new DirectionFlyAttackSkill(attack , skillConfig);
 			break;
 		}
 

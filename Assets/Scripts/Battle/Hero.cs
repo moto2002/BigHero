@@ -331,7 +331,7 @@ public class Hero : Charactor{
 	public void playSkill(int index){
 		this.attackCD = 0;
 
-		SkillConfig skillConfig = Config.GetInstance().GetSkillCOnfig(3);
+		SkillConfig skillConfig = Config.GetInstance().GetSkillCOnfig(1);
 
 		SkillManager.PlaySkill(this , null , skillConfig);
 	}
