@@ -57,6 +57,7 @@ public class DirectionFlyAttackSkill : Skill {
 			GameObject gameObject = (GameObject)MonoBehaviour.Instantiate(SkillObject_pre);
 			
 			skillObject = gameObject.GetComponent<SkillObject>();
+			skillObject.res = this.skillConfig.res;
 			skillObject.SetSpriteOff(new Vector2(0 , 0.3f));
 			
 			skillObject.transform.position = attackOne.transform.position + attackOff;

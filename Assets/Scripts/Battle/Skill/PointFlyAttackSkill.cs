@@ -22,33 +22,67 @@ public class PointFlyAttackSkill : Skill {
 	
 	private Vector3 attackedOff = Vector2.zero;
 	private Vector3 attackOff = Vector2.zero;
+
+	private SkillConfig skillConfig;
 	
-	public PointFlyAttackSkill(Charactor attackOne , Charactor attackedOne , int effectId){
+	public PointFlyAttackSkill(Charactor attackOne , SkillConfig skillConfig){
 		this.attackOne = attackOne;
 		this.attackedOne = attackedOne;
 
+
+		ArrayList points  = AttRange.GetRange(AttRange.TYPE_RECT , skillConfig.range ,  attackOne.GetAttribute().volume , attackOne.GetPoint());
+		
+		for(int i = 0 ; i < points.Count ; i++){
+			ArrayList objects = Battle.GetGameObjectsByPosition((Vector2)points[i]);
+			
+			for(int j = 0 ; j < objects.Count ; j++){
+				this.attackedOne = objects[j] as Charactor;
+				break;
+			}
+		}
+
+		if(attackedOne == null){
+			this.end = true;
+			return;
+		}
+
+
 		this.attackTransfrom = this.attackOne.transform;
 		this.attackedTransfrom = this.attackedOne.transform;
+
+		this.skillConfig = skillConfig;
 
 		attackOff = new Vector3((attackOne.GetAttribute().volume/2.0f - 0.5f) * Constance.GRID_GAP , (attackOne.GetAttribute().volume/2.0f - 0.5f) * Constance.GRID_GAP , 0);
 		attackedOff = new Vector3((attackedOne.GetAttribute().volume/2.0f - 0.5f) * Constance.GRID_GAP , (attackedOne.GetAttribute().volume/2.0f - 0.5f) * Constance.GRID_GAP , 0);
 	}
 	
 	public void Start(){
+		if(this.end == true){
+			return;
+		}
+		this.attackOne.PlayAttack();
 
-		GameObject gameObject = (GameObject)MonoBehaviour.Instantiate(SkillObject_pre);
-		
-		skillObject = gameObject.GetComponent<SkillObject>();
-		skillObject.transform.position = attackOne.transform.position + attackOff;
-
-		skillTransfrom = skillObject.transform;
-
-		skillTransfrom.eulerAngles = new Vector3(0,0,GetAngle()); 
 	}
 	
 	public void Update(){
 
 		if(this.end == true){
+			return;
+		}
+
+		if(skillObject == null && this.attackOne.IsInAttIndex()){
+			GameObject gameObject = (GameObject)MonoBehaviour.Instantiate(SkillObject_pre);
+			
+			skillObject = gameObject.GetComponent<SkillObject>();
+			skillObject.res = skillConfig.res;
+			skillObject.transform.position = attackOne.transform.position + attackOff;
+			
+			skillTransfrom = skillObject.transform;
+			
+			skillTransfrom.eulerAngles = new Vector3(0,0,GetAngle()); 
+		}
+
+		if(skillObject == null){
 			return;
 		}
 

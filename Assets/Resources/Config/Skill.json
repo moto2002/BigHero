@@ -1,4 +1,6 @@
 [
 	{"id":0 , "attack_type":0 , "range":1 , "res":1 , "target":1 , "param1":0 , "param2":0 , "name":"普攻" , "des":"普攻"},
-	{"id":1 , "attack_type":2 , "range":20 , "res":1 , "target":1 , "param1":0 , "param2":0 , "name":"fireball" , "des":"火球"}
+	{"id":1 , "attack_type":1 , "range":5 , "res":1 , "target":1 , "param1":0 , "param2":0 , "name":"fireball" , "des":"火球"},
+	{"id":2 , "attack_type":2 , "range":20 , "res":2 , "target":1 , "param1":0 , "param2":0 , "name":"fireball" , "des":"冲击波"},
+	{"id":3 , "attack_type":3 , "range":2 , "res":5 , "target":1 , "param1":0 , "param2":0 , "name":"thunder" , "des":"电击"}
 ]

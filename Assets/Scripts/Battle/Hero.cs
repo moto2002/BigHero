@@ -332,7 +332,6 @@ public class Hero : Charactor{
 		this.attackCD = 0;
 
 		SkillConfig skillConfig = Config.GetInstance().GetSkillCOnfig(1);
-
 		SkillManager.PlaySkill(this , null , skillConfig);
 	}
 
@@ -485,6 +484,9 @@ public class Hero : Charactor{
 		this.running = true;
 	}
 
+	public override int GetType(){
+		return TYPE_HERO;
+	}
 
 	public bool IsInPosition(Vector2 p){
 		if(p.x == this.position.x && p.y == this.position.y){
@@ -494,7 +496,7 @@ public class Hero : Charactor{
 		return false;
 	}
 
-	public Vector2 GetPoint(){
+	public override Vector2 GetPoint(){
 		return this.position;
 	}
 

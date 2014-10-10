@@ -176,6 +176,7 @@
      <Compile Include="Assets\Scripts\Battle\Skill\DirectionFlyAttackSkill.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\NormalAttackSkill.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\PointFlyAttackSkill.cs" />
+     <Compile Include="Assets\Scripts\Battle\Skill\RangeAttackSkill.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\Skill.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\SkillConfig.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\SkillManager.cs" />

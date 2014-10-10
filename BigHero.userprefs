@@ -1,6 +1,24 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Battle/Skill/RangeAttackSkill.cs">
+    <Files>
+      <File FileName="Assets/Scripts/Battle/Skill/Skill.cs" Line="6" Column="1" />
+      <File FileName="Assets/Scripts/InputManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Hero.cs" Line="334" Column="68" />
+      <File FileName="Assets/Scripts/Battle/Follower.cs" Line="389" Column="23" />
+      <File FileName="Assets/Scripts/Battle/Skill/SkillManager.cs" Line="20" Column="4" />
+      <File FileName="Assets/Scripts/Config.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Attribute.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/SkillConfig.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/PointFlyAttackSkill.cs" Line="77" Column="5" />
+      <File FileName="Assets/Scripts/Battle/Skill/NormalAttackSkill.cs" Line="32" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/DirectionFlyAttackSkill.cs" Line="111" Column="55" />
+      <File FileName="Assets/Scripts/Battle/Skill/RangeAttackSkill.cs" Line="80" Column="9" />
+      <File FileName="Assets/Scripts/Battle/Charactor.cs" Line="24" Column="38" />
+      <File FileName="Assets/Scripts/Battle/Monster.cs" Line="448" Column="22" />
+      <File FileName="Assets/Scripts/Battle/BattleUtils.cs" Line="28" Column="2" />
+      <File FileName="Assets/Scripts/Battle/Skill/SkillObject.cs" Line="12" Column="21" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
@@ -8,19 +26,9 @@
             <Node name="Scripts" expanded="True">
               <Node name="Battle" expanded="True">
                 <Node name="Skill" expanded="True">
-                  <Node name="DirectionFlyAttackSkill.cs" selected="True" />
+                  <Node name="RangeAttackSkill.cs" selected="True" />
                 </Node>
               </Node>
-            </Node>
-          </Node>
-          <Node name="Assembly-CSharp-firstpass" expanded="True">
-            <Node name="Plugins" expanded="True">
-              <Node name="FingerGestures" expanded="True" />
-            </Node>
-          </Node>
-          <Node name="Assembly-UnityScript" expanded="True">
-            <Node name="FingerGestures" expanded="True">
-              <Node name="SkeletonCode" expanded="True" />
             </Node>
           </Node>
         </State>
@@ -36,9 +44,7 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/Users/Walker/Documents/BigHero/Assets/Scripts/Battle/Monster.cs" line="97" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

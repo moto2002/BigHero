@@ -442,7 +442,11 @@ public class Monster : Charactor{
 	public override void PlayMoving(){
 		this.running = true;
 	}
-
+	
+	
+	public override int GetType(){
+		return TYPE_MONSTER;
+	}
 
 	public void PlayMove(){
 		if(this.charModel == null){

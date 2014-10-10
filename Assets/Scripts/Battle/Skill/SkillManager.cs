@@ -6,9 +6,10 @@ public class SkillManager {
 	public const int TYPE_NORMAL_ATT = 0;
 
 	public const int TYPE_POINT_FLYOBJECT_ATT = 1;
-
+	
 	public const int TYPE_DIRECTIONI_FLYOBJECT_ATT = 2;
-
+	
+	public const int TYPE_RANGE_ATT = 3;
 	
 	public static ArrayList runningSkill = new ArrayList();
 
@@ -33,10 +34,13 @@ public class SkillManager {
 			s = new NormalAttackSkill(attack , attacked);
 			break;
 		case TYPE_POINT_FLYOBJECT_ATT:
-			s = new PointFlyAttackSkill(attack , attacked , skillConfig.res);
+			s = new PointFlyAttackSkill(attack , skillConfig);
 			break;
 		case TYPE_DIRECTIONI_FLYOBJECT_ATT:
 			s = new DirectionFlyAttackSkill(attack , skillConfig);
+			break;
+		case TYPE_RANGE_ATT:
+			s = new RangeAttackSkill(attack , skillConfig);
 			break;
 		}
 

@@ -29,6 +29,8 @@ public class SpriteAnimation : MonoBehaviour {
 	/// 循环的次数，如果为0，则无限循环
 	/// </summary>
 	public int loopTimes;
+
+	private int curLoopTimes;
 	
 	private SpriteRenderer spriteRenderer;
 
@@ -37,8 +39,7 @@ public class SpriteAnimation : MonoBehaviour {
 
 	private float curTime;
 	private float changeTime;
-
-
+	
 	private bool running = true;
 	
 	// Use this for initialization
@@ -46,6 +47,7 @@ public class SpriteAnimation : MonoBehaviour {
 		index = 0;
 		changeTime = 1 / (float)fps;
 		curTime = 0;
+		curLoopTimes = 0;
 		
 		spriteRenderer = GetComponent<SpriteRenderer>();
 	}
@@ -76,9 +78,14 @@ public class SpriteAnimation : MonoBehaviour {
 		index++;
 
 		if(index >= this._sprites.Length){
+			curLoopTimes++;
 			index = 0;
 		}
 
+
+		if(loopTimes > 0 && curLoopTimes == loopTimes){
+			this.Stop();
+		}
 
 		this.spriteRenderer.sprite = this._sprites[index];
 	}
@@ -91,5 +98,13 @@ public class SpriteAnimation : MonoBehaviour {
 
 	public void Stop(){
 		running = false;
+	}
+
+	public bool IsEnd(){
+		if(loopTimes > 0 && curLoopTimes == loopTimes){
+			return true;
+		}
+
+		return false;
 	}
 }

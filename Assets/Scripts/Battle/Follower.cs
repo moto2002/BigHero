@@ -384,6 +384,10 @@ public class Follower: Charactor{
 	public override void PlayMoving(){
 		this.running = true;
 	}
+	
+	public override int GetType(){
+		return TYPE_FOLLOWER;
+	}
 
 	public void StopAnimation(){
 		this.model.Stop();
@@ -451,7 +455,7 @@ public class Follower: Charactor{
 	}
 	
 	
-	public Vector2 GetPoint(){
+	public override Vector2 GetPoint(){
 		return this.position;
 	}
 
