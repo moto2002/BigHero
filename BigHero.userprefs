@@ -1,23 +1,26 @@
-﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Battle/Skill/RangeAttackSkill.cs">
+﻿<Properties GitUserInfo="UsingGIT">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Battle/Monster.cs">
     <Files>
-      <File FileName="Assets/Scripts/Battle/Skill/Skill.cs" Line="6" Column="1" />
-      <File FileName="Assets/Scripts/InputManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Battle/Hero.cs" Line="334" Column="68" />
-      <File FileName="Assets/Scripts/Battle/Follower.cs" Line="389" Column="23" />
-      <File FileName="Assets/Scripts/Battle/Skill/SkillManager.cs" Line="20" Column="4" />
-      <File FileName="Assets/Scripts/Config.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Battle/Attribute.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Battle/Skill/SkillConfig.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Battle/Skill/PointFlyAttackSkill.cs" Line="77" Column="5" />
-      <File FileName="Assets/Scripts/Battle/Skill/NormalAttackSkill.cs" Line="32" Column="1" />
-      <File FileName="Assets/Scripts/Battle/Skill/DirectionFlyAttackSkill.cs" Line="111" Column="55" />
-      <File FileName="Assets/Scripts/Battle/Skill/RangeAttackSkill.cs" Line="80" Column="9" />
-      <File FileName="Assets/Scripts/Battle/Charactor.cs" Line="24" Column="38" />
-      <File FileName="Assets/Scripts/Battle/Monster.cs" Line="448" Column="22" />
-      <File FileName="Assets/Scripts/Battle/BattleUtils.cs" Line="28" Column="2" />
-      <File FileName="Assets/Scripts/Battle/Skill/SkillObject.cs" Line="12" Column="21" />
+      <File FileName="Assets/Scripts/Battle/Follower.cs" Line="381" Column="33" />
+      <File FileName="Assets/Scripts/GameEvent.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/FireWallAttackSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/MissileAttackSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/RangeAttackSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/SkillManager.cs" Line="42" Column="22" />
+      <File FileName="Assets/Scripts/Battle/Skill/SkillObject.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/WalkerPathSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/DirectionFlyAttackSkill.cs" Line="72" Column="1" />
+      <File FileName="Assets/Scripts/Battle/BattleUtils.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/FollowState.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Hero.cs" Line="441" Column="36" />
+      <File FileName="Assets/Scripts/Config.cs" Line="16" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Charactor.cs" Line="8" Column="36" />
+      <File FileName="Assets/Scripts/Battle/Skill/NormalAttackSkill.cs" Line="12" Column="2" />
+      <File FileName="Assets/Scripts/Battle/Monster.cs" Line="267" Column="32" />
+      <File FileName="Assets/Scripts/Battle/HPBar.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Battle.cs" Line="323" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Ground.cs" Line="23" Column="47" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -25,9 +28,8 @@
           <Node name="Assembly-CSharp" expanded="True">
             <Node name="Scripts" expanded="True">
               <Node name="Battle" expanded="True">
-                <Node name="Skill" expanded="True">
-                  <Node name="RangeAttackSkill.cs" selected="True" />
-                </Node>
+                <Node name="Skill" expanded="True" />
+                <Node name="Monster.cs" selected="True" />
               </Node>
             </Node>
           </Node>
