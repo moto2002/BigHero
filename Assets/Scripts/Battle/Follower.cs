@@ -26,6 +26,7 @@ public class Follower: Charactor{
 	private float attackCD = 1f;
 
 	private bool running = false;
+	private bool dead = false;
 	
 	private ArrayList attackRange;
 	public Attribute attribute;
@@ -35,7 +36,7 @@ public class Follower: Charactor{
 	
 	public FollowState state;
 
-	private AnimatorStateInfo animatorInfo;
+	private SkillConfig normalAttackSkill;
 
 	void Start () {
 		paths = new Queue();
@@ -53,7 +54,11 @@ public class Follower: Charactor{
 		attackRange.Add(new Vector2());
 		attackRange.Add(new Vector2());
 
-		animatorInfo = this.animator.GetCurrentAnimatorStateInfo(0);
+		
+		normalAttackSkill = Config.GetInstance().GetSkillCOnfig(0);
+		
+		attribute.hp = 10;
+		attribute.maxHp = 10;
 	}
 
 	void Update () {
@@ -70,6 +75,11 @@ public class Follower: Charactor{
 			Battle.UpdatePosition(this ,this.position);
 		}
 
+		
+		if(this.dead == true){
+			return;
+		}
+
 
 		UpdateState();
 		TryAttak();
@@ -80,9 +90,7 @@ public class Follower: Charactor{
 			return;
 		}
 		
-
-		
-		if(animatorInfo.IsName("Shake") && animatorInfo.normalizedTime >= 0.1f){
+		if( this.animator.GetCurrentAnimatorStateInfo(0).IsName("Shake") && this.animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.1f){
 			this.animator.SetInteger("State" , 0);
 		}
 	}
@@ -119,7 +127,7 @@ public class Follower: Charactor{
 			return;
 		}
 		
-		ArrayList points  = GetAttacKRange();
+		ArrayList points  = AttRange.GetRange(AttRange.TYPE_RECT , this.normalAttackSkill.range ,  this.attribute.volume , this.position);
 		
 		for(int i = 0 ; i < points.Count ; i++){
 			ArrayList monsters = Battle.GetMonstersByPoint((Vector2)points[i]);
@@ -136,61 +144,6 @@ public class Follower: Charactor{
 		}
 	}
 
-	private ArrayList GetAttacKRange(){
-		Vector2 v1 = (Vector2)attackRange[0];
-		Vector2 v2 = (Vector2)attackRange[1];
-		Vector2 v3 = (Vector2)attackRange[2];
-		
-		switch(this.currentDirection){
-		case MoveDirection.DOWN:
-			
-			v1.x = position.x;
-			v1.y = position.y+1;
-			
-			v2.x = position.x+1;
-			v2.y = position.y;
-			
-			v3.x = position.x-1;
-			v3.y = position.y;
-			break;
-		case MoveDirection.UP:
-			v1.x = position.x;
-			v1.y = position.y-1;
-			
-			v2.x = position.x+1;
-			v2.y = position.y;
-			
-			v3.x = position.x-1;
-			v3.y = position.y;
-			break;
-		case MoveDirection.LEFT:
-			v1.x = position.x - 1;
-			v1.y = position.y;
-			
-			v2.x = position.x;
-			v2.y = position.y + 1;
-			
-			v3.x = position.x;
-			v3.y = position.y - 1;
-			break;
-		case MoveDirection.RIGHT:
-			v1.x = position.x + 1;
-			v1.y = position.y;
-			
-			v2.x = position.x;
-			v2.y = position.y + 1;
-			
-			v3.x = position.x;
-			v3.y = position.y - 1;
-			break;
-		}
-		
-		attackRange[0] = v1;
-		attackRange[1] = v2;
-		attackRange[2] = v3;
-		
-		return attackRange;
-	}
 
 	public void SetDirection(MoveDirection direction){
 		this.currentDirection = direction;
@@ -203,12 +156,17 @@ public class Follower: Charactor{
 		}
 	}
 
-	public MoveDirection GetDirection(){
+	public override MoveDirection GetDirection(){
 		return this.currentDirection;
 	}
 
 
 	public void move(float distance){
+
+		if(dead == true){
+			return;
+		}
+
 
 		if(this.state == FollowState.WAIT_CLOSE){
 			//wait the targe move
@@ -230,10 +188,10 @@ public class Follower: Charactor{
 			}
 
 		}else if(this.state == FollowState.WAIT_FOLLOW){
-			float d = Mathf.Abs(this._moveTarget.transform.localPosition.x - this.transform.localPosition.x) + Mathf.Abs(this._moveTarget.transform.localPosition.y - this.transform.localPosition.y);
+			float d = GetMoveDistance(this._moveTarget, this.gameObject);
 
 
-			if(d >= Constance.GRID_GAP){
+			if(d >= Constance.GRID_GAP + 0.1f){
 				this.state = FollowState.FOLLOW;
 				
 				if(this._moveTarget.tag == "Hero"){
@@ -261,11 +219,16 @@ public class Follower: Charactor{
 			return;
 		}
 
+		float d2 = GetMoveDistance(((MonoBehaviour)this.prev).gameObject, this.gameObject);
 
-		if(this.follower != null){
-			this.follower.move (distance);
+		if(d2 > Constance.GRID_GAP + 0.1f){
+
+			if(d2 - Constance.GRID_GAP + 0.1f > 0.008f){
+				distance += 0.008f;
+			}else{
+				distance += d2 - Constance.GRID_GAP + 0.1f;
+			}
 		}
-
 
 		if(nextPosition.z == -1 && this.paths.Count > 0){
 			this.nextPosition = (Vector3)this.paths.Dequeue();
@@ -300,6 +263,12 @@ public class Follower: Charactor{
 			}
 
 			_move(distance);
+		}
+
+		
+		
+		if(this.follower != null){
+			this.follower.move (distance);
 		}
 	}
 
@@ -432,16 +401,21 @@ public class Follower: Charactor{
 		this.hpBar.SetHP(this.attribute.hp/this.attribute.maxHp);
 		
 		if(this.attribute.hp <= 0){
-			Battle.RemoveFollower(this);
+			PlayDead();
 		}
 	}
 
 	public override void PlayDead(){
+		dead = true;
 
 		if(this.prev is Hero){
 			((Hero)this.prev).follower = this.follower;
 		}else if(this.prev is Follower){
 			((Follower)this.prev).follower = this.follower;
+		}
+
+		if(this.follower != null){
+			this.follower.prev = this.prev;
 		}
 
 		this.state = FollowState.DEAD;
@@ -499,6 +473,11 @@ public class Follower: Charactor{
 
 	public override bool IsInAttIndex(){
 		return this.model.IsInAttIndex();
+	}
+
+
+	private float GetMoveDistance(GameObject object1 , GameObject object2){
+		return Mathf.Abs(object1.transform.localPosition.x - object2.transform.localPosition.x) + Mathf.Abs(object1.transform.localPosition.y - object2.transform.localPosition.y);
 	}
 }
 

@@ -5,7 +5,7 @@ public class Charactor : MonoBehaviour {
 
 	public const int TYPE_MONSTER = -1;
 
-	public const int TYPE_FOLLOWER = 0;
+	public const int TYPE_FOLLOWER = 1;
 
 	public const int TYPE_HERO = 1;
 

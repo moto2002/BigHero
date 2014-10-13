@@ -36,8 +36,11 @@ public class PointFlyAttackSkill : Skill {
 			ArrayList objects = Battle.GetGameObjectsByPosition((Vector2)points[i]);
 			
 			for(int j = 0 ; j < objects.Count ; j++){
-				this.attackedOne = objects[j] as Charactor;
-				break;
+
+				if((objects[j] as Charactor).GetType() != this.attackOne.GetType()){
+					this.attackedOne = objects[j] as Charactor;
+					break;
+				}
 			}
 		}
 
@@ -45,7 +48,6 @@ public class PointFlyAttackSkill : Skill {
 			this.end = true;
 			return;
 		}
-
 
 		this.attackTransfrom = this.attackOne.transform;
 		this.attackedTransfrom = this.attackedOne.transform;

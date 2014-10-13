@@ -11,6 +11,8 @@ public class SkillManager {
 	
 	public const int TYPE_RANGE_ATT = 3;
 	
+	public const int TYPE_FIREWALL_ATT = 4;
+	
 	public static ArrayList runningSkill = new ArrayList();
 
 	public static void Update(){
@@ -41,6 +43,9 @@ public class SkillManager {
 			break;
 		case TYPE_RANGE_ATT:
 			s = new RangeAttackSkill(attack , skillConfig);
+			break;
+		case TYPE_FIREWALL_ATT:
+			s = new FireWallAttackSkill(attack , skillConfig);
 			break;
 		}
 

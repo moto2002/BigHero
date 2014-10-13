@@ -41,8 +41,15 @@ public class Monster : Charactor{
 
 	private bool running = true;
 
-
 	private SkillConfig normalAttackSkill;
+
+	private int skillPolicy;
+
+	private ArrayList skills;
+
+	private int currentSkillIndex;
+
+	private int sumOfSkillOdds;
 
 	// Use this for initialization
 	void Start () {
@@ -69,7 +76,7 @@ public class Monster : Charactor{
 		}
 
 		this.TryMove();
-		//this.TryAttak();
+		this.TryAttack();
 	}
 	
 	private void UpdatePosition(){
@@ -103,7 +110,7 @@ public class Monster : Charactor{
 			return;
 		}
 
-		if(this.charModel.currentState == CharModel.State.ATTACK || attackCD < 1){
+		if(this.charModel.currentState == CharModel.State.ATTACK ){
 			return;
 		}
 
@@ -235,7 +242,56 @@ public class Monster : Charactor{
 		return true;
 	}
 
-	private void TryAttak(){
+	private void TryAttack(){
+
+		if(this.attackCD > 0){
+			this.attackCD -= Time.deltaTime;
+			return;
+		}
+
+		SkillItem skillItem = null;
+
+		if(this.skillPolicy == 1){
+			skillItem = skills[currentSkillIndex] as SkillItem;
+			currentSkillIndex++;
+
+			if(currentSkillIndex >= skills.Count){
+				currentSkillIndex = 0;
+			}
+		}else if(this.skillPolicy == 2){
+			int odds  = Random.Range(0 , this.sumOfSkillOdds);
+
+			for(int i = 0 ; i < this.skills.Count; i++){
+				skillItem = (SkillItem)skills[i];
+
+				if(skillItem.odds >= odds){
+					break;
+				}
+
+				odds -= skillItem.odds;
+			}
+		}
+
+
+		if(skillItem == null){
+			this.attackCD = 1;
+			return;
+		}
+
+
+		this.attackCD = skillItem.cd;
+
+
+		SkillConfig skillConfig = Config.GetInstance().GetSkillCOnfig(skillItem.skillId);
+
+		if(skillConfig == null){
+			return;
+		}
+
+		SkillManager.PlaySkill(this , null , skillConfig);
+
+		if(true)return;
+
 
 		if(attackTagets.Count > 0){
 
@@ -314,13 +370,34 @@ public class Monster : Charactor{
 		this.transform.localPosition = position;
 	}
 
+	public void SetSkills(JsonData jsonSkills){
+		sumOfSkillOdds = 0;
+
+		this.skills = new ArrayList();
+
+		for(int i = 0 ; i < jsonSkills.Count ; i++){
+			SkillItem skillItem = new SkillItem();
+
+			skillItem.skillId = (int)jsonSkills[i]["id"];
+			skillItem.cd = (int)jsonSkills[i]["cd"];
+			skillItem.odds = (int)jsonSkills[i]["odds"];
+
+			sumOfSkillOdds += skillItem.odds;
+
+			this.skills.Add(skillItem);
+		}
+	}
+
+	public void SetSkillPolicy(int policy){
+		this.skillPolicy = policy;
+	}
 
 	public void SetDirection(MoveDirection direction){
 		this.currentDirection = direction;
 		if(this.charModel != null)this.charModel.direction = direction;
 	}
 	
-	public MoveDirection GetDirection(){
+	public override MoveDirection GetDirection(){
 		return this.currentDirection;
 	}
 
@@ -455,12 +532,11 @@ public class Monster : Charactor{
 	}
 
 	public override void PlayAttack(){
-
-		if(this.animator == null){
+		if(this.charModel == null){
 			return;
 		}
 		
-		animator.SetInteger("State" , 1); 
+		this.charModel.PlayAttack();
 	}
 
 	public override void PlayDead(){
@@ -523,5 +599,14 @@ class PathPoint{
 }
 
 
+
+class SkillItem{
+
+	public int skillId;
+
+	public int cd;
+
+	public int odds;
+}
 
 

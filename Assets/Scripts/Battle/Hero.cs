@@ -146,6 +146,8 @@ public class Hero : Charactor{
 
 					follower.state = FollowState.WAIT_CLOSE;
 					follower.SetFollowTarget(this);
+
+					follower.SetDirection(this.direction);
 				}
 			}
 		}
@@ -331,7 +333,7 @@ public class Hero : Charactor{
 	public void playSkill(int index){
 		this.attackCD = 0;
 
-		SkillConfig skillConfig = Config.GetInstance().GetSkillCOnfig(1);
+		SkillConfig skillConfig = Config.GetInstance().GetSkillCOnfig(3);
 		SkillManager.PlaySkill(this , null , skillConfig);
 	}
 

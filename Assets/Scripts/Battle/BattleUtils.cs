@@ -16,7 +16,7 @@ public class BattleUtils{
 	
 	
 	public static Vector2 PositionToGrid(Vector2 v){
-		return PositionToGrid((int)v.x , (int)v.y);
+		return PositionToGrid(v.x , v.y);
 	}
 	
 	

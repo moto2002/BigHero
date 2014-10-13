@@ -13,10 +13,13 @@ public class Battle : MonoBehaviour {
 
 	public GameObject hero_pre;
 
+	public static int v;
+
+	public static int h;
+
 	public static Hero hero;
 
 	public static ArrayList followers = new ArrayList();
-
 	public static ArrayList monsters = new ArrayList();
 
 	private static Dictionary<Charactor , ArrayList> objectPositionTable = new Dictionary<Charactor , ArrayList>();
@@ -31,12 +34,6 @@ public class Battle : MonoBehaviour {
 	public delegate void onGameOver();
 
 	void Start () {
-		
-		Vector3 v1 = new Vector3(0,0,0);
-		
-		Vector3 v2 = new Vector3(-1,0,0);
-
-		print (Vector2.MoveTowards(v1 , v2 , 0.1f));
 	}
 
 
@@ -72,7 +69,9 @@ public class Battle : MonoBehaviour {
 		JsonData groundConfig = Config.GetInstance().GetGroundConfig(1);
 		groundMapConfig = groundConfig["map"];
 		ground.drawGround(groundMapConfig);
-		
+
+		Battle.h = ground.h;
+		Battle.v = ground.v;
 		
 		AddHero(groundConfig);
 		
@@ -269,7 +268,7 @@ public class Battle : MonoBehaviour {
 		//float att = (active.atk * 0.1f) + (active.atk * 0.1f) * (Random.Range(0,10) - 5)/100;
 		//return (int)att;
 		
-		return 0;
+		return 1;
 	}
 
 	public void AddHero(JsonData groundConfig){
@@ -321,6 +320,8 @@ public class Battle : MonoBehaviour {
 		monster.SetPosition (BattleUtils.GridToPosition((int)monsterConfig["x"] , (int)monsterConfig["y"]));
 		monster.SetMovePath(monsterConfig["path"]);
 		monster.SetSpeed(float.Parse(monsterConfig["speed"]+ ""));
+		monster.SetSkills(monsterConfig["skills"]);
+		monster.SetSkillPolicy((int)monsterConfig["policy"]);
 
 		int charID = int.Parse(monsterConfig["id"] + "");
 		Attribute attribute = Config.GetInstance().GetCharacterConfig(charID);
@@ -346,7 +347,6 @@ public class Battle : MonoBehaviour {
 	public static void RemoveFollower(Follower follower){
 		
 		RemovePosition(follower);
-		
 		followers.Remove(follower);
 	}
 
