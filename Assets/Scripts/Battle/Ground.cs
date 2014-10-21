@@ -36,7 +36,7 @@ public class Ground : MonoBehaviour {
 
 				sr.sprite = sprites[(int)mapGridConfig[i][j]];
 				Color c = sr.color;
-				c.a = 0.05f;
+				c.a = 0.0f;
 				sr.color = c;
 			}
 		}

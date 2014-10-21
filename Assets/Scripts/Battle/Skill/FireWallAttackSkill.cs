@@ -3,8 +3,7 @@ using System.Collections;
 using System.Timers;
 
 public class FireWallAttackSkill : Skill {
-
-
+	
 	private Charactor attackOne;
 
 	private SkillConfig skillConfig;
@@ -38,7 +37,9 @@ public class FireWallAttackSkill : Skill {
 
 	// Use this for initialization
 	public void Start () {
-		attackOne.PlayAttack();
+		
+		this.attackOne.PlaySkillAttack();
+		this.attackOne.SetPlayLock(true);
 		
 		Attribute attribute = attackOne.GetAttribute();
 
@@ -155,7 +156,7 @@ public class FireWallAttackSkill : Skill {
 
 				Charactor c = (Charactor)gameObjects[j];
 
-				if(c.GetType() !=  this.attackOne.GetType()){
+				if(c.GetType() !=  this.attackOne.GetType() && c.IsActive() == true){
 
 					float damage = Battle.Attack(attackOne.GetAttribute() , c.GetAttribute());
 					

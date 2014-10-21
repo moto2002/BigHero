@@ -13,7 +13,7 @@ public class CameraFollow : MonoBehaviour {
 
 
 	void Update () {
-		FollowHero();
+		//FollowHero();
 	}
 
 

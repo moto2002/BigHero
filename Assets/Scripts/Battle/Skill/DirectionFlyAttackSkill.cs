@@ -69,7 +69,8 @@ public class DirectionFlyAttackSkill : Skill {
 	}
 	
 	public void Start(){
-		this.attackOne.PlayAttack();
+		this.attackOne.PlaySkillAttack();
+		this.attackOne.SetPlayLock(true);
 	}
 	
 	public void Update(){
@@ -107,11 +108,8 @@ public class DirectionFlyAttackSkill : Skill {
 					break;
 				}
 
-
 				skillObjects.Add(skillObject);
 			}
-
-
 
 			attacked = true;
 		}
@@ -141,10 +139,11 @@ public class DirectionFlyAttackSkill : Skill {
 			Charactor attackedOne = null;
 
 			for(int j = 0 ; j < objects.Count ; j++){
-				if((objects[j] as Charactor).GetType() == this.attackOne.GetType()){
-					continue;
-				}else{
-					attackedOne = objects[j] as Charactor;
+				Charactor c = objects[j] as Charactor;
+
+				if(c.GetType() != this.attackOne.GetType() && c.IsActive() == true){
+					attackedOne = c;
+					break;
 				}
 			}
 

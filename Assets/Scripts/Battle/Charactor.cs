@@ -25,9 +25,15 @@ public class Charactor : MonoBehaviour {
 
 	public virtual void PlayDead(){}
 
+	public virtual void PlaySkillAttack(){}
+
+	public virtual void SetPlayLock(bool b){}
+
 	public virtual bool IsInAttIndex(){return false;}
 
 	public virtual int GetType(){return TYPE_MONSTER;}
 
 	public virtual Vector2 GetPoint(){return Vector2.zero;}
+
+	public virtual bool IsActive(){return false;}
 }

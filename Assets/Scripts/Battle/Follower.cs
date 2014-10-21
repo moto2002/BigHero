@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using LitJson;
 
 public class Follower: Charactor{
 
@@ -22,8 +23,9 @@ public class Follower: Charactor{
 	private Vector2 position;
 
 	private GameObject _moveTarget;
-
-	private float attackCD = 1f;
+	
+	private float skillCD = 1f;
+	private float normalSkillCD = 0f;
 
 	private bool running = false;
 	private bool dead = false;
@@ -35,6 +37,14 @@ public class Follower: Charactor{
 	private Queue attackTagets = new Queue();
 	
 	public FollowState state;
+	
+	private int skillPolicy;
+	
+	private ArrayList skills;
+	
+	private int currentSkillIndex;
+	
+	private int sumOfSkillOdds;
 
 	private SkillConfig normalAttackSkill;
 
@@ -53,12 +63,9 @@ public class Follower: Charactor{
 		attackRange.Add(new Vector2());
 		attackRange.Add(new Vector2());
 		attackRange.Add(new Vector2());
+		
+		this.normalAttackSkill = Config.GetInstance().GetSkillCOnfig(this.attribute.nskill);
 
-		
-		normalAttackSkill = Config.GetInstance().GetSkillCOnfig(0);
-		
-		attribute.hp = 10;
-		attribute.maxHp = 10;
 	}
 
 	void Update () {
@@ -95,53 +102,102 @@ public class Follower: Charactor{
 		}
 	}
 
+
 	private void TryAttak(){
-		if(this.state == FollowState.IDEL){
+		TryNormalAttack();
+		this.TrySkillAttack();
+	}
+	
+	
+	private void TryNormalAttack(){
+		if(normalAttackSkill == null){
 			return;
 		}
 
-
-		if(attackTagets.Count > 0 && this.model.IsInAttIndex()){
-			while(attackTagets.Count > 0){
-				Monster monster = (Monster)attackTagets.Dequeue();
-				
-				float damage = Battle.Attack(this.attribute , monster.attribute);
-				monster.ChangeHP(damage);
-				
-				if(monster.attribute.hp > 0){
-					monster.PlayAttack();
-				}else{
-					monster.PlayDead();
-				}
-			}
-		}
-		
-		if(this.attackCD < 1){
-			this.attackCD += Time.deltaTime;
-			return;
-		}
-
-		
-		if(this.attackCD < 1){
-			this.attackCD += Time.deltaTime;
+		if(normalSkillCD > 0){
+			normalSkillCD -= Time.deltaTime;
 			return;
 		}
 		
-		ArrayList points  = AttRange.GetRange(AttRange.TYPE_RECT , this.normalAttackSkill.range ,  this.attribute.volume , this.position);
+		if(this.model.currentState == CharModel.State.ATTACK){
+			return;
+		}
+		
+		
+		ArrayList points  = AttRange.GetRangeByAttType(this.normalAttackSkill.attack_type , this.normalAttackSkill.range ,  this.attribute.volume , this.position);
 		
 		for(int i = 0 ; i < points.Count ; i++){
-			ArrayList monsters = Battle.GetMonstersByPoint((Vector2)points[i]);
+			ArrayList gameObjects = Battle.GetGameObjectsByPosition((Vector2)points[i]);
 			
-			for(int j = 0 ; j < monsters.Count ; j++){
-				attackTagets.Enqueue(monsters[j]);
+			for(int j = 0 ; j < gameObjects.Count ; j++){
+				
+				Charactor c = (Charactor)gameObjects[j];
+				
+				if(c.IsActive() == true && c.GetType() != this.GetType()){
+					normalSkillCD = 1;
+					SkillManager.PlaySkill(this , normalAttackSkill , c);
+				}
 			}
 			
 		}
-		
-		if(attackTagets.Count > 0){
-			this.model.PlayAttack();
-			this.attackCD = 0;
+	}
+
+
+	
+	private void TrySkillAttack(){
+		if(this.skillCD > 0){
+			this.skillCD -= Time.deltaTime;
+			return;
 		}
+		
+		if(skills.Count == 0){
+			return;
+		}
+		
+		if(this.model.currentState == CharModel.State.ATTACK){
+			return;
+		}
+		
+		SkillItem skillItem = null;
+		
+		if(this.skillPolicy == 1){
+			skillItem = skills[currentSkillIndex] as SkillItem;
+			currentSkillIndex++;
+			
+			if(currentSkillIndex >= skills.Count){
+				currentSkillIndex = 0;
+			}
+		}else if(this.skillPolicy == 2){
+			int odds  = Random.Range(0 , this.sumOfSkillOdds);
+			
+			for(int i = 0 ; i < this.skills.Count; i++){
+				skillItem = (SkillItem)skills[i];
+				
+				if(skillItem.odds >= odds){
+					break;
+				}
+				
+				odds -= skillItem.odds;
+			}
+		}
+		
+		
+		if(skillItem == null){
+			this.skillCD = 1;
+			return;
+		}
+		
+		
+		this.skillCD = skillItem.cd;
+		
+		SkillConfig skillConfig = Config.GetInstance().GetSkillCOnfig(skillItem.skillId);
+		
+		if(skillConfig == null){
+			return;
+		}
+		
+		skillConfig.b = skillItem.b;
+		SkillManager.PlaySkill(this , skillConfig);
 	}
 
 
@@ -338,6 +394,30 @@ public class Follower: Charactor{
 		directions.Enqueue(direction);
 	}
 
+
+	public void SetSkills(JsonData jsonSkills){
+		sumOfSkillOdds = 0;
+		
+		this.skills = new ArrayList();
+		
+		for(int i = 0 ; i < jsonSkills.Count ; i++){
+			SkillItem skillItem = new SkillItem();
+			
+			skillItem.skillId = int.Parse(jsonSkills[i]["id"].ToString());
+			skillItem.cd = int.Parse(jsonSkills[i]["cd"].ToString());
+			skillItem.odds = int.Parse(jsonSkills[i]["odds"].ToString());
+			skillItem.b = int.Parse(jsonSkills[i]["b"].ToString());
+			
+			sumOfSkillOdds += skillItem.odds;
+			
+			this.skills.Add(skillItem);
+		}
+	}
+	
+	public void SetSkillPolicy(int policy){
+		this.skillPolicy = policy;
+	}
+
 	public void SetPosition(Vector3 v){
 		this.transform.localPosition = v;
 	}
@@ -384,6 +464,14 @@ public class Follower: Charactor{
 		}
 
 		this.model.PlayAttack();
+	}
+
+	public override void PlaySkillAttack(){
+		if(this.model == null){
+			return;
+		}
+		
+		this.model.PlaySkillAttack();
 	}
 
 
@@ -461,6 +549,15 @@ public class Follower: Charactor{
 			}else{
 				return false;
 			}
+		}
+
+		return false;
+	}
+
+	
+	public override bool IsActive (){
+		if(this.state == FollowState.FOLLOW){
+			return true;
 		}
 
 		return false;

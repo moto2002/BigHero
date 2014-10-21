@@ -10,25 +10,50 @@ public class RangeAttackSkill : Skill {
 	private SkillConfig skillConfig;
 	
 	private static GameObject SkillObject_pre  = (GameObject)Resources.Load("Prefabs/SkillEffect");
+	private static GameObject AlertBlock_pre  = (GameObject)Resources.Load("Prefabs/AlertBlock");
 
 	private ArrayList skillObjects;
+	
+	private ArrayList range;
+	
+	private ArrayList alertBlocks;
 
 	private bool attacked = false;
+
+	private bool subtract = false;
+	
+	private float singTime;
 
 	public RangeAttackSkill(Charactor attackOne , SkillConfig skillConfig){
 
 		this.attackOne = attackOne;
 		this.skillConfig = skillConfig;
+		this.subtract = subtract;
+		
+		singTime = skillConfig.singTime;
 
 		skillObjects = new ArrayList();
-
 	}
 
 	public void Start (){
+		this.attackOne.PlaySkillAttack();
+		this.attackOne.SetPlayLock(true);
+		
+		Vector2 v = BattleUtils.PositionToGrid(attackOne.transform.position.x , attackOne.transform.position.y);
+		
+		Attribute attribute = attackOne.GetAttribute();
+		this.range = AttRange.GetRangeByAttType(skillConfig.attack_type , skillConfig.range , attribute.volume , v);
 
-		this.attackOne.PlayAttack();
-
-
+		
+		alertBlocks = new ArrayList();
+		
+		for(int i = 0 ; i < range.Count ; i ++){
+			
+			GameObject gameObject = (GameObject)MonoBehaviour.Instantiate(AlertBlock_pre);
+			gameObject.transform.position = BattleUtils.GridToPosition((Vector2)range[i]);
+			
+			alertBlocks.Add(gameObject);
+		}
 	}
 	
 	public void Update (){
@@ -37,28 +62,24 @@ public class RangeAttackSkill : Skill {
 		}
 
 
+		singTime -= Time.deltaTime;
+		
+		if(singTime > 0){
+			return;
+		}
+
+		
+		while(alertBlocks.Count > 0){
+			GameObject gameObject = alertBlocks[0] as GameObject;
+			MonoBehaviour.Destroy(gameObject);
+			
+			alertBlocks.RemoveAt(0);
+		}
+
 		if(this.attackOne.IsInAttIndex() == true && attacked == false){
 			Vector2 v = BattleUtils.PositionToGrid(attackOne.transform.position.x , attackOne.transform.position.y);
 			
 			Attribute attribute = attackOne.GetAttribute();
-			
-			ArrayList points = AttRange.GetRange(AttRange.TYPE_RECT , skillConfig.range , attribute.volume , v);
-
-			//random
-			ArrayList range = new ArrayList();
-			if(skillConfig.param1 > 0){
-
-				for(int i = 0 ; i < skillConfig.param1 ; i++){
-					object o = points[Random.Range(0 , points.Count)];
-
-					if(range.Contains(o) == false){
-						range.Add(o);
-					}
-				}
-			}else{
-				range = points;
-			}
-
 			
 			for(int i = 0 ; i < range.Count ; i ++){
 				
@@ -67,6 +88,7 @@ public class RangeAttackSkill : Skill {
 				SkillObject skillObject = gameObject.GetComponent<SkillObject>();
 				skillObject.res = this.skillConfig.res;
 				skillObject.loop = 1;
+				skillObject.transform.localScale = new Vector3(0.5f, 0.5f , 0);
 				
 				skillObject.transform.position = BattleUtils.GridToPosition((Vector2)range[i]);
 				
@@ -77,7 +99,7 @@ public class RangeAttackSkill : Skill {
 				for(int j = 0 ; j < objects.Count ; j++){
 					Charactor c = objects[j] as Charactor;
 					
-					if(c.GetType() != this.attackOne.GetType()){
+					if(c.GetType() != this.attackOne.GetType() && c.IsActive() == true){
 						
 						float damage = Battle.Attack(attackOne.GetAttribute() , c.GetAttribute());
 						
@@ -108,7 +130,9 @@ public class RangeAttackSkill : Skill {
 				MonoBehaviour.Destroy(skillObject.gameObject);
 
 				skillObjects.Remove(skillObjects);
+
 				end = true;
+				this.attackOne.SetPlayLock(false);
 			}
 		}
 	}

@@ -27,17 +27,16 @@ public class PointFlyAttackSkill : Skill {
 	
 	public PointFlyAttackSkill(Charactor attackOne , SkillConfig skillConfig){
 		this.attackOne = attackOne;
-		this.attackedOne = attackedOne;
 
-
-		ArrayList points  = AttRange.GetRange(AttRange.TYPE_RECT , skillConfig.range ,  attackOne.GetAttribute().volume , attackOne.GetPoint());
+		ArrayList points  = AttRange.GetRangeByAttType(skillConfig.attack_type , skillConfig.range ,  attackOne.GetAttribute().volume , attackOne.GetPoint() , attackOne.GetDirection());
 		
 		for(int i = 0 ; i < points.Count ; i++){
 			ArrayList objects = Battle.GetGameObjectsByPosition((Vector2)points[i]);
 			
 			for(int j = 0 ; j < objects.Count ; j++){
+				Charactor c = objects[j] as Charactor;
 
-				if((objects[j] as Charactor).GetType() != this.attackOne.GetType()){
+				if(c.GetType() != this.attackOne.GetType() && c.IsActive() == true){
 					this.attackedOne = objects[j] as Charactor;
 					break;
 				}
@@ -62,8 +61,8 @@ public class PointFlyAttackSkill : Skill {
 		if(this.end == true){
 			return;
 		}
-		this.attackOne.PlayAttack();
 
+		this.attackOne.PlaySkillAttack();
 	}
 	
 	public void Update(){
@@ -73,9 +72,11 @@ public class PointFlyAttackSkill : Skill {
 		}
 
 		if(skillObject == null && this.attackOne.IsInAttIndex()){
+
 			GameObject gameObject = (GameObject)MonoBehaviour.Instantiate(SkillObject_pre);
 			
 			skillObject = gameObject.GetComponent<SkillObject>();
+			skillObject.spriteAnimation.renderer.sortingLayerID = 3;
 			skillObject.res = skillConfig.res;
 			skillObject.transform.position = attackOne.transform.position + attackOff;
 			
@@ -95,7 +96,6 @@ public class PointFlyAttackSkill : Skill {
 		if(d1 > d2){
 			MonoBehaviour.Destroy(this.skillObject.gameObject);
 			this.end = true;
-
 
 			float damage = Battle.Attack(attackOne.GetAttribute() , attackedOne.GetAttribute());
 			

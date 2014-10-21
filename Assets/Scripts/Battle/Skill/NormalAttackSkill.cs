@@ -9,13 +9,40 @@ public class NormalAttackSkill: Skill{
 
 	private bool end = false;
 
-	public NormalAttackSkill(Charactor attackOne , Charactor attackedOne){
+	private SkillConfig skillConfig;
+
+	public NormalAttackSkill(Charactor attackOne , SkillConfig skillConfig ,  Charactor attackedOne){
 		this.attackOne = attackOne;
 		this.attackedOne = attackedOne;
+
+		this.skillConfig = skillConfig;
 	}
 
 	public void Start(){
-		attackOne.PlayAttack();
+
+		if(attackedOne == null){
+
+			ArrayList points  = AttRange.GetRangeByAttType(skillConfig.attack_type , this.skillConfig.range ,  this.attackOne.GetAttribute().volume , this.attackOne.GetPoint());
+			
+			for(int i = 0 ; i < points.Count ; i++){
+				ArrayList gameObjects = Battle.GetGameObjectsByPosition((Vector2)points[i]);
+				
+				for(int j = 0 ; j < gameObjects.Count ; j++){
+					Charactor c = (Charactor)gameObjects[j];
+
+					if(c.IsActive() == true && c.GetType() != attackOne.GetType()){
+						this.attackedOne = c;
+					}
+				}
+			}
+
+		}
+
+		if(attackedOne != null){
+			attackOne.PlayAttack();
+		}else{
+			end = true;
+		}
 	}
 
 	public void Update(){
@@ -27,7 +54,6 @@ public class NormalAttackSkill: Skill{
 		if(this.attackOne.IsInAttIndex() == false){
 			return;
 		}
-
 
 		float damage = Battle.Attack(attackOne.GetAttribute() , attackedOne.GetAttribute());
 

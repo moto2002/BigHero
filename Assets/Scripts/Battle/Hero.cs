@@ -119,7 +119,7 @@ public class Hero : Charactor{
 
 		skills = new ArrayList();
 
-		normalAttackSkill = Config.GetInstance().GetSkillCOnfig(0);
+		normalAttackSkill = Config.GetInstance().GetSkillCOnfig(1001);
 	}
 	
 	// Update is called once per frame
@@ -165,9 +165,13 @@ public class Hero : Charactor{
 	}
 
 
-	private void UpdatePosition(){
-
+	private void SortY(){
 		this.spriteRenderer.sortingOrder = -(int)(this.transform.localPosition.y * 10);
+	}
+
+
+	private void UpdatePosition(){
+		this.SortY();
 		
 		int x = (int)Mathf.Round(this.transform.localPosition.x / Constance.GRID_GAP);
 		int y = -(int)Mathf.Round(this.transform.localPosition.y / Constance.GRID_GAP);
@@ -297,33 +301,20 @@ public class Hero : Charactor{
 
 
 	private void NormalAttack(){
-		if(attackTagets.Count > 0){
-			this.model.PlayAttack();
-			this.attackCD = 0;
-			
-			while(attackTagets.Count > 0){
-				Charactor charactor = (Charactor)attackTagets.Dequeue();
-				
-				SkillManager.PlaySkill(this , charactor, normalAttackSkill);
-			}
-			
-		}
-		
 		if(this.attackCD < 1){
 			this.attackCD += Time.deltaTime;
 			return;
 		}
 		
-		ArrayList points  = AttRange.GetRange(AttRange.TYPE_RECT , this.normalAttackSkill.range ,  this.attribute.volume , this.position);
+		ArrayList points  = AttRange.GetRangeByAttType(normalAttackSkill.attack_type , this.normalAttackSkill.range ,  this.attribute.volume , this.position);
 		
 		for(int i = 0 ; i < points.Count ; i++){
 			ArrayList monsters = Battle.GetMonstersByPoint((Vector2)points[i]);
 			
-			for(int j = 0 ; j < monsters.Count ; j++){
-				
-				if(attackTagets.Contains(monsters[j]) == false){
-					attackTagets.Enqueue(monsters[j]);
-				}
+			if(monsters.Count > 0){
+				this.attackCD = 0;
+				this.PlayAttack();
+				SkillManager.PlaySkill(this , normalAttackSkill);
 			}
 		}
 	}
@@ -334,7 +325,7 @@ public class Hero : Charactor{
 		this.attackCD = 0;
 
 		SkillConfig skillConfig = Config.GetInstance().GetSkillCOnfig(3);
-		SkillManager.PlaySkill(this , null , skillConfig);
+		SkillManager.PlaySkill(this , skillConfig);
 	}
 
 
@@ -447,6 +438,15 @@ public class Hero : Charactor{
 	}
 
 
+	public override void PlaySkillAttack(){
+		if(this.model == null){
+			return;
+		}
+		
+		this.model.PlaySkillAttack();
+	}
+
+
 	public override void PlayDead(){
 		Battle.HeroDead(this);
 		this.dead = true;
@@ -517,6 +517,10 @@ public class Hero : Charactor{
 
 	public override bool IsInAttIndex(){
 		return this.model.IsInAttIndex();
+	}
+
+	public override bool IsActive (){
+		return true;
 	}
 }
 

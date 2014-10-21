@@ -2,11 +2,12 @@
 using System.Collections;
 
 public class SpriteAnimation : MonoBehaviour {
-	
+
+	private  Sprite[] ss;
+
 	private Sprite[] _sprites;
 	public Sprite[] sprites{
 		set{
-
 			if(spriteRenderer == null){
 				spriteRenderer = GetComponent<SpriteRenderer>();
 			}
@@ -41,7 +42,7 @@ public class SpriteAnimation : MonoBehaviour {
 	private float changeTime;
 	
 	private bool running = true;
-	
+
 	// Use this for initialization
 	public void Start () {
 		index = 0;
@@ -84,6 +85,7 @@ public class SpriteAnimation : MonoBehaviour {
 
 
 		if(loopTimes > 0 && curLoopTimes == loopTimes){
+			index = this._sprites.Length - 1;
 			this.Stop();
 		}
 

@@ -11,12 +11,14 @@ public class SkillConfig {
 
 	public int res;
 
-
-	//1 self
-	//2 self and self side
-	//3 other side
+	public int singTime;
+	//1 one of enemy
+	//2 all of enemy
+	//3 one of self side
+	//4 all of self side
 	public int target;
 
+	public int target_num;
 
 	public int param1;
 
@@ -25,4 +27,6 @@ public class SkillConfig {
 	public string name;
 
 	public string desc;
+
+	public int b;
 }

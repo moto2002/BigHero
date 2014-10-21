@@ -7,10 +7,11 @@ public class Monster : Charactor{
 
 	public GameObject model;
 
+	public Animator animator;
+	
 	public CharModel charModel;
 
-
-	public Animator animator;
+	public SpriteAnimation teleport;
 
 	public SpriteRenderer spriteRenderer;
 
@@ -31,13 +32,12 @@ public class Monster : Charactor{
 
 	public HPBar hpBar;
 
-	private float attackCD = 1;
+	private float skillCD = 1;
+	private float normalSkillCD = 0;
 	
 	public GameObject hp_pop;
 
-	private Queue attackTagets = new Queue();
 	private bool dead = false;
-
 
 	private bool running = true;
 
@@ -53,11 +53,15 @@ public class Monster : Charactor{
 
 	// Use this for initialization
 	void Start () {
-		this.normalAttackSkill = Config.GetInstance().GetSkillCOnfig(0);
+
+		this.normalAttackSkill = Config.GetInstance().GetSkillCOnfig(this.attribute.nskill);
 
 		this.charModel.direction = this.currentDirection;
+		this.charModel.Stop();
+		this.charModel.gameObject.SetActive(false);
+		this.hpBar.gameObject.SetActive(false);
 
-		this.attribute.volume = 2;
+		teleport.sprites = Resources.LoadAll<Sprite>(@"Image/Teleport");
 
 		this.model.gameObject.transform.localPosition = new Vector2( (this.attribute.volume/2.0f - 0.5f) * Constance.GRID_GAP , -(this.attribute.volume/2.0f - 0.5f) * Constance.GRID_GAP);
 	}
@@ -67,8 +71,20 @@ public class Monster : Charactor{
 		if(Constance.RUNNING == false){
 			return;
 		}
-
 		
+		if(teleport != null){
+
+			if(teleport.IsEnd() == true){
+				Destroy(teleport.gameObject);
+				teleport = null;
+				this.charModel.Play();
+				this.charModel.gameObject.SetActive(true);
+				this.hpBar.gameObject.SetActive(true);
+			}
+
+			return;
+		}
+
 		this.UpdateState();
 
 		if(this.dead == true){
@@ -76,12 +92,17 @@ public class Monster : Charactor{
 		}
 
 		this.TryMove();
+		this.SortY();
 		this.TryAttack();
 	}
+
+	private void SortY(){
+		this.spriteRenderer.sortingOrder = -(int)(this.transform.localPosition.y * 10 + (this.attribute.volume/2.0f - 0.5f));
+	}
+
 	
 	private void UpdatePosition(){
 
-		this.spriteRenderer.sortingOrder = -(int)(this.transform.localPosition.y * 10 + (this.attribute.volume/2.0f - 0.5f));
 		
 		int x = (int)Mathf.Round(this.transform.localPosition.x / Constance.GRID_GAP);
 		int y = -(int)Mathf.Round(this.transform.localPosition.y / Constance.GRID_GAP);
@@ -110,13 +131,13 @@ public class Monster : Charactor{
 			return;
 		}
 
-		if(this.charModel.currentState == CharModel.State.ATTACK ){
+		if(this.charModel.currentState != CharModel.State.MOVE ){
 			return;
 		}
 
 		UpdatePosition();
 
-		if(this.pathPoints == null || this.pathPoints.Count == 0){
+		if(this.pathPoints == null || this.pathPoints.Count <= 1){
 			return;
 		}
 
@@ -243,102 +264,94 @@ public class Monster : Charactor{
 	}
 
 	private void TryAttack(){
+		this.TryNormalAttack();
+		this.TrySkillAttack();
+	}
 
-		if(this.attackCD > 0){
-			this.attackCD -= Time.deltaTime;
+
+	private void TryNormalAttack(){
+		if(normalSkillCD > 0){
+			normalSkillCD -= Time.deltaTime;
 			return;
 		}
 
-		SkillItem skillItem = null;
+		if(this.charModel.currentState == CharModel.State.ATTACK){
+			return;
+		}
 
+
+		ArrayList points  = AttRange.GetRangeByAttType(normalAttackSkill.attack_type , this.normalAttackSkill.range ,  this.attribute.volume , this.position , this.currentDirection);
+		
+		for(int i = 0 ; i < points.Count ; i++){
+			ArrayList gameObjects = Battle.GetGameObjectsByPosition((Vector2)points[i]);
+
+			for(int j = 0 ; j < gameObjects.Count ; j++){
+
+				Charactor c = (Charactor)gameObjects[j];
+
+				if(c.IsActive() == true && c.GetType() != this.GetType()){
+					normalSkillCD = 1;
+					SkillManager.PlaySkill(this , normalAttackSkill , c);
+				}
+			}
+
+		}
+	}
+
+	private void TrySkillAttack(){
+		if(this.skillCD > 0){
+			this.skillCD -= Time.deltaTime;
+			return;
+		}
+
+		if(skills.Count == 0){
+			return;
+		}
+
+		if(this.charModel.currentState == CharModel.State.ATTACK){
+			return;
+		}
+		
+		SkillItem skillItem = null;
+		
 		if(this.skillPolicy == 1){
 			skillItem = skills[currentSkillIndex] as SkillItem;
 			currentSkillIndex++;
-
+			
 			if(currentSkillIndex >= skills.Count){
 				currentSkillIndex = 0;
 			}
 		}else if(this.skillPolicy == 2){
 			int odds  = Random.Range(0 , this.sumOfSkillOdds);
-
+			
 			for(int i = 0 ; i < this.skills.Count; i++){
 				skillItem = (SkillItem)skills[i];
-
+				
 				if(skillItem.odds >= odds){
 					break;
 				}
-
+				
 				odds -= skillItem.odds;
 			}
 		}
-
-
+		
+		
 		if(skillItem == null){
-			this.attackCD = 1;
+			this.skillCD = 1;
 			return;
 		}
-
-
-		this.attackCD = skillItem.cd;
-
-
+		
+		
 		SkillConfig skillConfig = Config.GetInstance().GetSkillCOnfig(skillItem.skillId);
-
+		
+		this.skillCD = skillItem.cd + skillConfig.singTime;
+		
 		if(skillConfig == null){
 			return;
 		}
-
-		SkillManager.PlaySkill(this , null , skillConfig);
-
-		if(true)return;
-
-
-		if(attackTagets.Count > 0){
-
-			this.charModel.PlayAttack();
-			this.attackCD = 0;
-			
-			while(attackTagets.Count > 0){
-				Charactor charactor = (Charactor)attackTagets.Dequeue();
-				
-				SkillManager.PlaySkill(this , charactor , normalAttackSkill);
-			}
-			
-		}
-
 		
-		if(this.attackCD < 1){
-			this.attackCD += Time.deltaTime;
-			return;
-		}
-
-		
-		ArrayList points  = AttRange.GetRange(AttRange.TYPE_CORSS , this.normalAttackSkill.range , this.attribute.volume, this.position);
-		
-		for(int i = 0 ; i < points.Count ; i++){
-			ArrayList followers = Battle.GetFollowersByPoint((Vector2)points[i]);
-			
-			if(followers.Count > 0){
-				
-				for(int j = 0 ; j < followers.Count  ; j++){
-
-					Follower f = (Follower)followers[j];
-
-					if(f.state == FollowState.FOLLOW){
-						attackTagets.Enqueue(followers[j]);
-					}
-				}
-			}
-
-			if(Battle.hero.GetPoint() == (Vector2)points[i] && Battle.hero.IsDead() == false){
-				attackTagets.Enqueue(Battle.hero);
-			}
-		}
-
-		if(attackTagets.Count > 0){
-			this.charModel.PlayAttack();
-			this.attackCD = 0;
-		}
+		skillConfig.b = skillItem.b;
+		SkillManager.PlaySkill(this , skillConfig);
 	}
 
 
@@ -378,9 +391,10 @@ public class Monster : Charactor{
 		for(int i = 0 ; i < jsonSkills.Count ; i++){
 			SkillItem skillItem = new SkillItem();
 
-			skillItem.skillId = (int)jsonSkills[i]["id"];
-			skillItem.cd = (int)jsonSkills[i]["cd"];
-			skillItem.odds = (int)jsonSkills[i]["odds"];
+			skillItem.skillId = int.Parse(jsonSkills[i]["id"].ToString());
+			skillItem.cd = int.Parse(jsonSkills[i]["cd"].ToString());
+			skillItem.odds = int.Parse(jsonSkills[i]["odds"].ToString());
+			skillItem.b = int.Parse(jsonSkills[i]["b"].ToString());
 
 			sumOfSkillOdds += skillItem.odds;
 
@@ -479,7 +493,7 @@ public class Monster : Charactor{
 		this.transform.localPosition = p;
 	}
 
-	public Vector2 GetPoint(){
+	public override Vector2 GetPoint(){
 		return this.position;
 	}
 
@@ -539,6 +553,14 @@ public class Monster : Charactor{
 		this.charModel.PlayAttack();
 	}
 
+	public override void PlaySkillAttack(){
+		if(this.model == null){
+			return;
+		}
+
+		this.charModel.PlaySkillAttack();
+	}
+
 	public override void PlayDead(){
 		this.dead = true;
 
@@ -553,6 +575,14 @@ public class Monster : Charactor{
 		this.charModel.PlayDead();
 	}
 
+	public override void SetPlayLock(bool b){
+		if(this.model == null){
+			return;
+		}
+		
+		this.charModel.SetPlayLock(b);
+	}
+	
 	public bool IsDead(){
 		return this.dead;
 	}
@@ -564,6 +594,11 @@ public class Monster : Charactor{
 
 	public override bool IsInAttIndex(){
 		return this.charModel.IsInAttIndex();
+	}
+
+	
+	public override bool IsActive (){
+		return true;
 	}
 }
 
@@ -607,6 +642,8 @@ class SkillItem{
 	public int cd;
 
 	public int odds;
+
+	public int b;
 }
 
 

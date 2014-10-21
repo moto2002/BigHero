@@ -2,18 +2,38 @@
 using System.Collections;
 
 public class AttRange {
+	
 
-	public const int TYPE_CORSS = 1;
-
-	public const int TYPE_RECT = 2;
-
-	public static ArrayList GetRange(int type , int range , int volume , Vector2 zorePoint){
+	public static ArrayList GetRangeByAttType(int type , int range , int volume , Vector2 zeroPoint , MoveDirection direction = MoveDirection.UP){
 
 		switch(type){
-		case TYPE_CORSS:
-			return CrossRange(range , volume, zorePoint);
-		case TYPE_RECT:
-			return RectRange(range , volume , zorePoint);
+		case 1:
+			return HalfRectRange(range , volume , zeroPoint , direction);
+			break;
+		case 2:
+			return LineRange(range , volume , zeroPoint , direction);
+			break;
+		case 3:
+			return RectRange(range , volume , zeroPoint);
+			break;
+		case 4:
+			return SubRectRange(range , volume , zeroPoint);
+			break;
+		case 5:
+			return SectorRange(range , volume , zeroPoint , direction);
+			break;
+		case 6:
+			return RectRange(range , volume , zeroPoint);
+			break;
+		case 7:
+			return RectRange(range , volume , zeroPoint);
+			break;
+		case 8:
+			return RectRange(range , volume , zeroPoint);
+			break;
+		case 9:
+			return HalfRectRange(range , volume , zeroPoint , direction);
+			break;
 		}
 
 		return new ArrayList();
@@ -64,14 +84,227 @@ public class AttRange {
 		for(int i = (int)zeroPoint.x - range ; i < (int)zeroPoint .x + range + volume ; i++){
 			for (int j = (int)zeroPoint.y - range ; j < (int)zeroPoint.y + range + volume ; j++){
 				
-				if( i >= zeroPoint.x && i < zeroPoint.x + volume && j >= zeroPoint.y && j < zeroPoint.y + volume){
-					continue;
-				}
+//				if( i >= zeroPoint.x && i < zeroPoint.x + volume && j >= zeroPoint.y && j < zeroPoint.y + volume){
+//					continue;
+//				}
 				
 				rangs.Add(new Vector2(i ,j));
 			}
 		}
 		
+		return rangs;
+	}
+
+
+	private static ArrayList SubRectRange(int range , int volume , Vector2 zeroPoint){
+
+		int minx = (int)zeroPoint.x - range;
+		int maxx = (int)zeroPoint.x + range + volume;
+		int miny = (int)zeroPoint.y - range;;
+		int maxy = (int)zeroPoint.y + range + volume;
+
+		ArrayList rangs = new ArrayList();
+
+
+		for(int i = 0; i < Battle.v ; i++){
+			for(int j = 0 ; j < Battle.h ; j++){
+
+				if(j >= minx && j <= maxx && i >= miny && i <= maxy){
+					continue;
+				}
+
+				rangs.Add(new Vector2(j ,i));
+			}
+		}
+
+		return rangs;
+	}
+
+
+	private static ArrayList SectorRange(int range , int volume, Vector2 zeroPoint , MoveDirection direction){
+		
+		ArrayList rangs = new ArrayList();
+
+		switch(direction){
+		case MoveDirection.LEFT:
+			//left
+			for(int i = 0 ; i < range ; i++){
+				
+				int x = (int)zeroPoint.x - 1 - i;
+				
+				for(int j = 0 ; j < volume + i * 2 ; j++){
+					
+					int y = (int)zeroPoint.y - i + j;
+					
+					rangs.Add(new Vector2(x ,y));
+				}
+			}
+			break;
+		case MoveDirection.UP:
+			for(int i = 0 ; i < range ; i++){
+				
+				int y = (int)zeroPoint.y - 1 - i;
+				
+				for(int j = 0 ; j < volume + i * 2 ; j++){
+					
+					int x = (int)zeroPoint.x - i + j ;
+					
+					rangs.Add(new Vector2(x ,y));
+				}
+			}
+			break;
+		case MoveDirection.RIGHT:
+			for(int i = 0 ; i < range ; i++){
+				
+				int x = (int)zeroPoint.x + volume + i;
+				
+				for(int j = 0 ; j < volume + i * 2 ; j++){
+					
+					int y = (int)zeroPoint.y - i + j;
+					
+					rangs.Add(new Vector2(x ,y));
+				}
+			}
+			break;
+		case MoveDirection.DOWN:
+			for(int i = 0 ; i < range ; i++){
+				
+				int y = (int)zeroPoint.y + volume + i;
+				
+				for(int j = 0 ; j < volume + i * 2 ; j++){
+					
+					int x = (int)zeroPoint.x - i + j ;
+					
+					rangs.Add(new Vector2(x ,y));
+				}
+			}
+			break;
+		}
+
+		return rangs;
+	}
+
+
+	private static ArrayList HalfRectRange(int range , int volume, Vector2 zeroPoint , MoveDirection direction){
+		ArrayList rangs = new ArrayList();
+
+		switch(direction){
+		case MoveDirection.LEFT:
+			//left
+			for(int i = 0 ; i < range ; i++){
+				
+				int x = (int)zeroPoint.x - i - 1;
+				
+				for(int j = 0 ; j < volume + range * 2; j++){
+					int y = (int)zeroPoint.y - range + j;
+					
+					rangs.Add(new Vector2(x ,y));
+				}
+			}
+			break;
+		case MoveDirection.UP:
+			for(int i = 0 ; i < range ; i++){
+				
+				int y = (int)zeroPoint.y - 1 - i;
+				
+				for(int j = 0 ; j < volume + range * 2 ; j++){
+					
+					int x = (int)zeroPoint.x - range + j;
+					
+					rangs.Add(new Vector2(x ,y));
+				}
+			}
+			break;
+		case MoveDirection.RIGHT:
+			for(int i = 0 ; i < range + volume ; i++){
+				
+				int x = (int)zeroPoint.x + i;
+				
+				for(int j = 0 ; j < volume + range * 2 ; j++){
+					
+					int y = (int)zeroPoint.y - range + j;
+					
+					rangs.Add(new Vector2(x ,y));
+				}
+			}
+			break;
+		case MoveDirection.DOWN:
+			for(int i = 0 ; i < range + volume ; i++){
+				
+				int y = (int)zeroPoint.y + i;
+				
+				for(int j = 0 ; j < volume + range * 2 ; j++){
+					
+					int x = (int)zeroPoint.x - range + j ;
+					
+					rangs.Add(new Vector2(x ,y));
+				}
+			}
+			break;
+		}
+
+		return rangs;
+	}
+
+
+	private static ArrayList LineRange(int range , int volume, Vector2 zeroPoint , MoveDirection direction){
+		ArrayList rangs = new ArrayList();
+
+		switch(direction){
+		case MoveDirection.LEFT:
+			//left
+			for(int i = 0 ; i < range ; i++){
+
+				int x = (int)zeroPoint.x - i - 1;
+
+				for(int j = 0 ; j < volume; j++){
+					int y = (int)zeroPoint.y + j;
+					
+					rangs.Add(new Vector2(x ,y));
+				}
+			}
+			break;
+		case MoveDirection.UP:
+			for(int i = 0 ; i < range ; i++){
+				
+				int y = (int)zeroPoint.y - 1 - i;
+				
+				for(int j = 0 ; j < volume ; j++){
+					
+					int x = (int)zeroPoint.x + j;
+					
+					rangs.Add(new Vector2(x ,y));
+				}
+			}
+			break;
+		case MoveDirection.RIGHT:
+			for(int i = 0 ; i < range ; i++){
+				
+				int x = (int)zeroPoint.x + volume + i;
+				
+				for(int j = 0 ; j < volume ; j++){
+					
+					int y = (int)zeroPoint.y + j;
+					
+					rangs.Add(new Vector2(x ,y));
+				}
+			}
+			break;
+		case MoveDirection.DOWN:
+			for(int i = 0 ; i < range ; i++){
+				
+				int y = (int)zeroPoint.y + volume + i;
+				
+				for(int j = 0 ; j < volume ; j++){
+					
+					int x = (int)zeroPoint.x + j ;
+					
+					rangs.Add(new Vector2(x ,y));
+				}
+			}
+			break;
+		}
+
 		return rangs;
 	}
 

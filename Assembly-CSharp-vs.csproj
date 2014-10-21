@@ -160,6 +160,7 @@
      <Compile Include="Assets\NGUI\Scripts\UI\UITexture.cs" />
      <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
      <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
+     <Compile Include="Assets\Scripts\AlertBlock.cs" />
      <Compile Include="Assets\Scripts\Battle\AttackRzt.cs" />
      <Compile Include="Assets\Scripts\Battle\Attribute.cs" />
      <Compile Include="Assets\Scripts\Battle\Battle.cs" />
@@ -175,10 +176,13 @@
      <Compile Include="Assets\Scripts\Battle\Skill\AttRange.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\DirectionFlyAttackSkill.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\FireWallAttackSkill.cs" />
+     <Compile Include="Assets\Scripts\Battle\Skill\LineAttackSkill.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\MissileAttackSkill.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\NormalAttackSkill.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\PointFlyAttackSkill.cs" />
+     <Compile Include="Assets\Scripts\Battle\Skill\RandomAttackSkill.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\RangeAttackSkill.cs" />
+     <Compile Include="Assets\Scripts\Battle\Skill\SectorRangeAttackSkill.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\Skill.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\SkillConfig.cs" />
      <Compile Include="Assets\Scripts\Battle\Skill\SkillManager.cs" />
@@ -197,7 +201,9 @@
      <Compile Include="Assets\Scripts\Loader.cs" />
      <Compile Include="Assets\Scripts\MoveDirection.cs" />
      <Compile Include="Assets\Scripts\SpriteAnimation.cs" />
+     <Compile Include="Assets\Scripts\Test.cs" />
      <Compile Include="Assets\Scripts\UIManager.cs" />
+     <Compile Include="Assets\Scripts\iLog.cs" />
      <None Include="Assets\NGUI\ReadMe - 3.6.7.txt" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Text 2.shader" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Text 1.shader" />

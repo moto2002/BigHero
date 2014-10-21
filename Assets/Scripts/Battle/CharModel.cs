@@ -32,6 +32,8 @@ public class CharModel : SpriteAnimation {
 	public int model;
 
 	private float deadTime = 0;
+	
+	private bool stateLock = false;
 
 	public enum State{
 		MOVE,
@@ -41,6 +43,10 @@ public class CharModel : SpriteAnimation {
 		ATTACKED,
 		SKILL
 	}
+
+	//1 normal att
+	//2 skill att
+	private int attType = 1;
 
 
 	private State _currentState;
@@ -54,7 +60,11 @@ public class CharModel : SpriteAnimation {
 				Move ();
 				break;
 				case State.ATTACK:
-				PlayAttack (false);
+				if(attType == 1){
+					PlayAttack (false);
+				}else{
+					PlaySkillAttack(false);
+				}
 				break;
 			}
 		}
@@ -81,94 +91,183 @@ public class CharModel : SpriteAnimation {
 		}
 	}
 
-
 	// Use this for initialization
 	public void Start () {
 		base.Start();
 	}
 
 	public void SetID(int id){
-		Sprite [] modelSprites = Resources.LoadAll<Sprite>(@"Image/Model/" + id + "_w");
+		base.fps = 8;
 
-		if(modelSprites != null){
+		Texture2D texture2d = Resources.Load<Texture2D>("Image/Model/" + id + "/w");
+
+		if(texture2d != null){
 			moveUp = new Sprite[4];
 			moveDown = new Sprite[4];
 			moveLeft = new Sprite[4];
 			moveRight = new Sprite[4];
-			
-			moveDown[0] = modelSprites[0];
-			moveDown[1] = modelSprites[1];
-			moveDown[2] = modelSprites[2];
-			moveDown[3] = modelSprites[3];
-			
-			moveLeft[0] = modelSprites[4];
-			moveLeft[1] = modelSprites[5];
-			moveLeft[2] = modelSprites[6];
-			moveLeft[3] = modelSprites[7];
-			
-			moveUp[0] = modelSprites[8];
-			moveUp[1] = modelSprites[9];
-			moveUp[2] = modelSprites[10];
-			moveUp[3] = modelSprites[11];
-			
-			moveRight[0] = modelSprites[12];
-			moveRight[1] = modelSprites[13];
-			moveRight[2] = modelSprites[14];
-			moveRight[3] = modelSprites[15];
+
+			int w = texture2d.width / 4;
+			int h = texture2d.height / 4;
+
+			for(int i = 0 ; i < 4 ; i++){
+				for(int j = 0 ; j < 4 ; j++){
+					Rect r = new Rect();
+
+					r.x = j * w;
+					r.y = i * h;
+					r.width = w;
+					r.height = h;
+					
+					Vector2 p = new Vector2();
+					
+					p.x = 0.5f;
+					p.y = 0.3f;
+					
+					Sprite s = Sprite.Create(texture2d , r ,p);
+					
+					if(i == 0){
+						moveRight[j] = s;
+					}else if(i == 1){
+						moveUp[j] = s;
+					}else if(i == 2){
+						moveLeft[j] = s;
+					}else if(i == 3){
+						moveDown[j] = s;
+					}
+					
+				}
+			}
 		}
+
 		
-		modelSprites = Resources.LoadAll<Sprite>(@"Image/Model/" + id + "_a");
-		if(modelSprites != null){
+		texture2d = Resources.Load<Texture2D>("Image/Model/" + id + "/a");
+		if(texture2d != null){
 
 			attUp = new Sprite[4];
 			attDown = new Sprite[4];
 			attLeft = new Sprite[4];
 			attRight = new Sprite[4];
-			attDown[0] = modelSprites[0];
-			attDown[1] = modelSprites[1];
-			attDown[2] = modelSprites[2];
-			attDown[3] = modelSprites[3];
-			attLeft[0] = modelSprites[4];
-			attLeft[1] = modelSprites[5];
-			attLeft[2] = modelSprites[6];
-			attLeft[3] = modelSprites[7];
-			attUp[0] = modelSprites[8];
-			attUp[1] = modelSprites[9];
-			attUp[2] = modelSprites[10];
-			attUp[3] = modelSprites[11];
-			attRight[0] = modelSprites[12];
-			attRight[1] = modelSprites[13];
-			attRight[2] = modelSprites[14];
-			attRight[3] = modelSprites[15];
+
+			int w = texture2d.width / 4;
+			int h = texture2d.height / 4;
+			
+			for(int i = 0 ; i < 4 ; i++){
+				for(int j = 0 ; j < 4 ; j++){
+					Rect r = new Rect();
+
+					r.x = j * w;
+					r.y = i * h;
+					r.width = w;
+					r.height = h;
+					
+					Vector2 p = new Vector2();
+					
+					p.x = 0.5f;
+					p.y = 0.3f;
+					
+					Sprite s = Sprite.Create(texture2d , r ,p);
+					
+					if(i == 0){
+						attRight[j] = s;
+					}else if(i == 1){
+						attUp[j] = s;
+					}else if(i == 2){
+						attLeft[j] = s;
+					}else if(i == 3){
+						attDown[j] = s;
+					}
+				}
+			}
 
 		}
 
 
 		
-		modelSprites = Resources.LoadAll<Sprite>(@"Image/Model/" + id + "_d");
-		if(modelSprites != null){
+		texture2d = Resources.Load<Texture2D>("Image/Model/" + id + "/d");
+		if(texture2d != null){
 			
 			deadUp = new Sprite[4];
 			deadDown = new Sprite[4];
 			deadLeft = new Sprite[4];
 			deadRight = new Sprite[4];
-			deadDown[0] = modelSprites[0];
-			deadDown[1] = modelSprites[1];
-			deadDown[2] = modelSprites[2];
-			deadDown[3] = modelSprites[3];
-			deadLeft[0] = modelSprites[4];
-			deadLeft[1] = modelSprites[5];
-			deadLeft[2] = modelSprites[6];
-			deadLeft[3] = modelSprites[7];
-			deadUp[0] = modelSprites[8];
-			deadUp[1] = modelSprites[9];
-			deadUp[2] = modelSprites[10];
-			deadUp[3] = modelSprites[11];
-			deadRight[0] = modelSprites[12];
-			deadRight[1] = modelSprites[13];
-			deadRight[2] = modelSprites[14];
-			deadRight[3] = modelSprites[15];
 			
+			
+			int w = texture2d.width / 4;
+			int h = texture2d.height / 4;
+			
+			for(int i = 0 ; i < 4 ; i++){
+				for(int j = 0 ; j < 4 ; j++){
+					Rect r = new Rect();
+					
+					r.x = j * w;
+					r.y = i * h;
+					r.width = w;
+					r.height = h;
+					
+					Vector2 p = new Vector2();
+					
+					p.x = 0.5f;
+					p.y = 0.3f;
+					
+					Sprite s = Sprite.Create(texture2d , r ,p);
+					
+					if(i == 0){
+						deadRight[j] = s;
+					}else if(i == 1){
+						deadUp[j] = s;
+					}else if(i == 2){
+						deadLeft[j] = s;
+					}else if(i == 3){
+						deadDown[j] = s;
+					}
+				}
+			}
+		}
+
+
+		
+		
+		
+		texture2d = Resources.Load<Texture2D>("Image/Model/" + id + "/s");
+		if(texture2d != null){
+			
+			skillUp = new Sprite[4];
+			skillDown = new Sprite[4];
+			skillLeft = new Sprite[4];
+			skillRight = new Sprite[4];
+			
+			
+			int w = texture2d.width / 4;
+			int h = texture2d.height / 4;
+			
+			for(int i = 0 ; i < 4 ; i++){
+				for(int j = 0 ; j < 4 ; j++){
+					Rect r = new Rect();
+					
+					r.x = j * w;
+					r.y = i * h;
+					r.width = w;
+					r.height = h;
+					
+					Vector2 p = new Vector2();
+					
+					p.x = 0.5f;
+					p.y = 0.3f;
+					
+					Sprite s = Sprite.Create(texture2d , r ,p);
+					
+					if(i == 0){
+						skillRight[j] = s;
+					}else if(i == 1){
+						skillUp[j] = s;
+					}else if(i == 2){
+						skillLeft[j] = s;
+					}else if(i == 3){
+						skillDown[j] = s;
+					}
+				}
+			}
 		}
 
 		currentState = State.MOVE;
@@ -179,7 +278,10 @@ public class CharModel : SpriteAnimation {
 	void Update () {
 
 		base.Update();
-		base.fps = 8;
+
+		if(stateLock == true){
+			return;
+		}
 
 		if(base.index == 3 && (this.currentState == State.ATTACK ||
 			   this.currentState == State.ATTACKED ||
@@ -224,7 +326,8 @@ public class CharModel : SpriteAnimation {
 
 
 	public void PlayAttack(bool b = true){
-		
+
+		attType = 1;
 		_currentState = State.ATTACK;
 
 		if(b == true){
@@ -248,6 +351,32 @@ public class CharModel : SpriteAnimation {
 	}
 
 
+	public void PlaySkillAttack(bool b = true){
+		attType = 2;
+
+		_currentState = State.ATTACK;
+
+		if(b == true){
+			base.index = 0;
+		}
+		
+		switch(this.direction){
+		case MoveDirection.UP:
+			this.sprites = this.skillUp;
+			break;
+		case MoveDirection.DOWN:
+			this.sprites = this.skillDown;
+			break;
+		case MoveDirection.LEFT:
+			this.sprites = this.skillLeft;
+			break;
+		case MoveDirection.RIGHT:
+			this.sprites = this.skillRight;
+			break;
+		}
+	}
+
+
 	public void PlayDead(){
 		base.index = 0;
 		_currentState = State.DEAD;
@@ -266,6 +395,10 @@ public class CharModel : SpriteAnimation {
 			this.sprites = this.deadRight;
 			break;
 		}
+	}
+
+	public void SetPlayLock(bool b){
+		this.stateLock = b;
 	}
 
 	void LaterUpdate(){

@@ -33,13 +33,17 @@ public class Attribute  {
 
 	}
 
+	public int nskill;
+
+	public int sskill;
+
+	public int equip;
+
 	public int addhp;
 
 	public int addatk;
 
 	public int crit;
-
-	public int attribute;
 
 	public int opentype;
 

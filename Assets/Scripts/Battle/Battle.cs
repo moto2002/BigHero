@@ -27,11 +27,19 @@ public class Battle : MonoBehaviour {
 
 	private static JsonData groundMapConfig;
 
+	private static float timeLine = 0f;
+
+	private ArrayList prepareMonsters;
+	private ArrayList prepareFollowers;
+
+	public static float countdownTime = 0;
+
 	private int heroID = 1001;
 
 	public delegate void OnGameWin();
 
 	public delegate void onGameOver();
+
 
 	void Start () {
 	}
@@ -39,10 +47,26 @@ public class Battle : MonoBehaviour {
 
 
 	void Update () {
+		if(Constance.RUNNING == false){
+			return;
+		}
+
+		if((int)timeLine < (int)(timeLine + Time.deltaTime)){
+			CheckTimePoint();
+		}
+
+		timeLine += Time.deltaTime;
+
+//		if(timeLine >= countdownTime){
+//			//time's up
+//			Constance.RUNNING = false;
+//		}
+
 		SkillManager.Update();
 	}
 
 	public void Build(){
+
 		Constance.RUNNING = false;
 
 		if(hero != null)Destroy(hero.gameObject);
@@ -66,31 +90,59 @@ public class Battle : MonoBehaviour {
 		objectPositionTable = new Dictionary<Charactor , ArrayList>();
 		positionObjectTable = new Dictionary<Vector2 , ArrayList>();
 
-		JsonData groundConfig = Config.GetInstance().GetGroundConfig(1);
+		JsonData groundConfig = Config.GetInstance().GetGroundConfig(1002);
 		groundMapConfig = groundConfig["map"];
 		ground.drawGround(groundMapConfig);
 
 		Battle.h = ground.h;
 		Battle.v = ground.v;
+		Battle.countdownTime = (int)groundConfig["limitTime"];
 		
 		AddHero(groundConfig);
+
+		
+		prepareMonsters = new ArrayList();
+		prepareFollowers = new ArrayList();
 		
 		JsonData monsterConfigs = groundConfig["monster"];
 		
 		for(int i = 0 ; i < monsterConfigs.Count ; i++){
 			JsonData monsterConfig = monsterConfigs[i];
-			
-			this.AddMonster(monsterConfig);
+			prepareMonsters.Add(monsterConfig);
 		}
 		
 		JsonData followerConfigs = groundConfig["follower"];
 		
 		for(int i = 0 ; i < followerConfigs.Count ; i++){
 			JsonData followerConfig = followerConfigs[i];
-			
-			this.AddFollower(followerConfig);
+			prepareFollowers.Add(followerConfig);
 		}
 
+	}
+
+
+	private void CheckTimePoint(){
+
+		for(int i = 0 ; i < prepareFollowers.Count ; i++){
+			JsonData followerConfig = (JsonData)prepareFollowers[i];
+			
+			if((int)followerConfig["startTime"] <= timeLine){
+				this.AddFollower(followerConfig);
+				prepareFollowers.Remove(followerConfig);
+				i--;
+			}
+
+		}
+
+		for(int i = 0 ; i < prepareMonsters.Count ; i++){
+			JsonData monsterConfig = (JsonData)prepareMonsters[i];
+			
+			if((int)monsterConfig["startTime"] <= timeLine){
+				this.AddMonster(monsterConfig);
+				prepareMonsters.Remove(monsterConfig);
+				i--;
+			}
+		}
 	}
 
 
@@ -295,7 +347,8 @@ public class Battle : MonoBehaviour {
 		follower.transform.parent = this.transform;
 
 		follower.SetPosition (BattleUtils.GridToPosition((int)followerConfig["x"] , (int)followerConfig["y"]));
-
+		follower.SetSkills(followerConfig["skills"]);
+		follower.SetSkillPolicy((int)followerConfig["policy"]);
 		follower.SetDirection(MoveDirection.DOWN);
 		follower.StopAnimation();
 
