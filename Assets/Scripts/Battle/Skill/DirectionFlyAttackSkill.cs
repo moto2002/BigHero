@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DirectionFlyAttackSkill : Skill {
+public class DirectionFlyAttackSkill {
+	
+	private bool specSign = false;
 
 	private int effectId;
 
@@ -14,6 +16,7 @@ public class DirectionFlyAttackSkill : Skill {
 	private bool end = false;
 
 	private static GameObject SkillObject_pre  = (GameObject)Resources.Load("Prefabs/SkillEffect");
+	private static GameObject AlertBlock_pre  = (GameObject)Resources.Load("Prefabs/AlertBlock");
 
 	private ArrayList skillObjects;
 
@@ -27,11 +30,19 @@ public class DirectionFlyAttackSkill : Skill {
 
 	private SkillConfig skillConfig;
 
+	private ArrayList range;
+	
+	private ArrayList alertBlocks;
+
 	private bool attacked = false;
+	
+	private float singTime;
+
 	
 	public DirectionFlyAttackSkill(Charactor attackOne , SkillConfig skillConfig){
 
 		this.skillConfig = skillConfig;
+		this.singTime = skillConfig.singTime;
 
 		this.effectId = skillConfig.res;
 		this.distance = skillConfig.range * Constance.GRID_GAP;
@@ -43,6 +54,7 @@ public class DirectionFlyAttackSkill : Skill {
 
 		directions = new ArrayList();
 		skillObjects = new ArrayList();
+		alertBlocks = new ArrayList();
 
 		switch(skillConfig.param1){
 		case 0:
@@ -66,20 +78,65 @@ public class DirectionFlyAttackSkill : Skill {
 			directions.Add(attackOne.GetDirection());
 			break;
 		}
+
+
+
 	}
 	
 	public void Start(){
 		this.attackOne.PlaySkillAttack();
-		this.attackOne.SetPlayLock(true);
+
+		if(this.singTime > 0){
+
+			this.attackOne.SetPlayLock(true);
+			
+			Vector2 v = BattleUtils.PositionToGrid(attackOne.transform.position.x , attackOne.transform.position.y);
+			
+			Attribute attribute = attackOne.GetAttribute();
+			this.range = AttRange.GetRangeByAttType(skillConfig.attack_type , skillConfig.range , attribute.volume , v);
+
+			
+			for(int i = 0 ; i < range.Count ; i ++){
+				
+				GameObject gameObject = (GameObject)MonoBehaviour.Instantiate(AlertBlock_pre);
+				gameObject.transform.position = BattleUtils.GridToPosition((Vector2)range[i]);
+				
+				alertBlocks.Add(gameObject);
+			}
+		}
 	}
 	
 	public void Update(){
+
+		if(Constance.SPEC_RUNNING == false && Constance.RUNNING == false){
+			return;
+		}else if(Constance.SPEC_RUNNING == true && this.specSign == false){
+			return;
+		}
 
 		if(this.end == true){
 			return;
 		}
 
+		singTime -= Time.deltaTime;
+		
+		if(singTime > 0){
+			return;
+		}
+
+		
+		
+		while(alertBlocks.Count > 0){
+			GameObject gameObject = alertBlocks[0] as GameObject;
+			MonoBehaviour.Destroy(gameObject);
+			
+			alertBlocks.RemoveAt(0);
+		}
+
+
+
 		if(attackOne.IsInAttIndex() == true && attacked == false){
+			Attribute attribute = attackOne.GetAttribute();
 			beginPosition = attackOne.transform.position + attackOff;
 
 
@@ -87,10 +144,15 @@ public class DirectionFlyAttackSkill : Skill {
 				MoveDirection dirction = (MoveDirection)directions[i];
 
 				GameObject gameObject = (GameObject)MonoBehaviour.Instantiate(SkillObject_pre);
+				gameObject.transform.localScale = new Vector3(attribute.volume / 4f , attribute.volume / 4f , 0);
 				
 				SkillObject skillObject = gameObject.GetComponent<SkillObject>();
 				skillObject.res = this.skillConfig.res;
-				skillObject.SetSpriteOff(new Vector2(0 , 0.3f));
+				if(this.specSign == true){
+					skillObject.spriteAnimation.renderer.sortingLayerID = 7;
+				}else{
+					skillObject.spriteAnimation.renderer.sortingLayerID = 1;
+				}
 				
 				skillObject.transform.position = attackOne.transform.position + attackOff;
 				
@@ -102,9 +164,11 @@ public class DirectionFlyAttackSkill : Skill {
 					skillObject.SetSpriteEulerAngles(new Vector3(0,0, 90));
 					break;
 				case MoveDirection.LEFT:
-					skillObject.SetSpriteEulerAngles(new Vector3(0,0, 180));
+					skillObject.SetSpriteOff(new Vector2(0 , 0.15f));
+					skillObject.gameObject.transform.localScale += new Vector3(-skillObject.gameObject.transform.localScale.x * 2 , 0, 0);
 					break;
 				case MoveDirection.RIGHT:
+					skillObject.SetSpriteOff(new Vector2(0 , 0.15f));
 					break;
 				}
 
@@ -133,9 +197,44 @@ public class DirectionFlyAttackSkill : Skill {
 				continue;
 			}
 
+
+			float d1 = Time.deltaTime * speed;
+
+			Vector3 newPosition = Vector3.zero;
+			
+			switch(direction){
+			case MoveDirection.DOWN:
+				newPosition = skillObject.transform.position + new Vector3(0 , -d1 , 0);
+				break;
+			case MoveDirection.UP:
+				newPosition = skillObject.transform.position + new Vector3(0 , d1 , 0);
+				break;
+			case MoveDirection.LEFT:
+				newPosition = skillObject.transform.position + new Vector3(-d1 , 0 , 0);
+				break;
+			case MoveDirection.RIGHT:
+				newPosition = skillObject.transform.position + new Vector3(d1 , 0 , 0);
+				break;
+			}
+
+			bool inNewGrid = false;
+
+			if(BattleUtils.PositionToGrid(newPosition) != BattleUtils.PositionToGrid(skillObject.transform.position)){
+				//in diffrenet grid
+				inNewGrid = true;
+			}
+
+			skillObject.transform.position = newPosition;
+
+			if(inNewGrid == false){
+				continue;
+			}
+
+
+			//Try attack
 			Vector2 v = BattleUtils.PositionToGrid(skillObject.transform.position);
 
-			ArrayList objects = Battle.GetGameObjectsByPosition(v);
+			ArrayList objects = BattleControllor.GetGameObjectsByPosition(v);
 			Charactor attackedOne = null;
 
 			for(int j = 0 ; j < objects.Count ; j++){
@@ -149,11 +248,10 @@ public class DirectionFlyAttackSkill : Skill {
 
 
 			if(attackedOne != null){
-				MonoBehaviour.Destroy(skillObject.gameObject);
+				bool crit = BattleControllor.Crit(skillConfig.crit);
+				float damage = BattleControllor.Attack(attackOne.GetAttribute() , attackedOne.GetAttribute() , skillConfig.demageratio , skillConfig.b , crit);
 
-				float damage = Battle.Attack(attackOne.GetAttribute() , attackedOne.GetAttribute());
-				
-				attackedOne.ChangeHP(damage);
+				attackedOne.ChangeHP(damage , crit);
 				
 				if(attackedOne.GetAttribute().hp > 0){
 					attackedOne.PlayAttacked();
@@ -165,22 +263,7 @@ public class DirectionFlyAttackSkill : Skill {
 			}
 
 
-			float d1 = Time.deltaTime * speed;
 
-			switch(direction){
-			case MoveDirection.DOWN:
-				skillObject.transform.position = skillObject.transform.position + new Vector3(0 , -d1 , 0);
-				break;
-			case MoveDirection.UP:
-				skillObject.transform.position = skillObject.transform.position + new Vector3(0 , d1 , 0);
-				break;
-			case MoveDirection.LEFT:
-				skillObject.transform.position = skillObject.transform.position + new Vector3(-d1 , 0 , 0);
-				break;
-			case MoveDirection.RIGHT:
-				skillObject.transform.position = skillObject.transform.position + new Vector3(d1 , 0 , 0);
-				break;
-			}
 		}
 
 		
@@ -193,7 +276,9 @@ public class DirectionFlyAttackSkill : Skill {
 		end = true;
 	}
 
-
+	public void SetSpec(bool b){
+		this.specSign = b;
+	}
 
 	public bool IsEnd(){
 		return end;

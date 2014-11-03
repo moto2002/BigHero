@@ -8,4 +8,8 @@ public interface Skill {
 	void Update ();
 
 	bool IsEnd();
+
+	void SetSpec(bool b);
+
+	void Clean();
 }

@@ -1,28 +1,60 @@
 ﻿<Properties GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Battle/Battle.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Battle/Skill/SkillManager.cs">
     <Files>
-      <File FileName="Assets/Scripts/Battle/Battle.cs" Line="131" Column="42" />
-      <File FileName="Assets/Scripts/Battle/Follower.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Battle/Skill/NormalAttackSkill.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/iLog.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Battle/Skill/PointFlyAttackSkill.cs" Line="65" Column="36" />
-      <File FileName="Assets/Scripts/Battle/Skill/SkillManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Battle/Skill/RangeAttackSkill.cs" Line="45" Column="35" />
-      <File FileName="Assets/Scripts/Battle/Hero.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Battle/Skill/LineAttackSkill.cs" Line="100" Column="61" />
-      <File FileName="Assets/Scripts/Battle/Skill/RandomAttackSkill.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Battle/Skill/SectorRangeAttackSkill.cs" Line="20" Column="30" />
-      <File FileName="Assets/Scripts/Battle/Ground.cs" Line="33" Column="5" />
-      <File FileName="Assets/Scripts/Battle/Monster.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Battle/Skill/DirectionFlyAttackSkill.cs" Line="68" Column="4" />
+      <File FileName="Assets/Scripts/GuanItemIcon.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/Sub/S2008.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/GuanListItem.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/Sub/S2007.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/LineAttackSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/HealSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/SkillObject.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/CharModel.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Attribute.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/PointFlyAttackSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/DirectionFlyAttackSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/RangeAttackSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/Skill.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Battle/Skill/FireWallAttackSkill.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/SpriteAnimation.cs" Line="83" Column="14" />
-      <File FileName="Assets/Scripts/Battle/Charactor.cs" Line="30" Column="33" />
-      <File FileName="Assets/Scripts/AlertBlock.cs" Line="10" Column="61" />
-      <File FileName="Assets/Scripts/Battle/CharModel.cs" Line="232" Column="14" />
+      <File FileName="Assets/Scripts/Battle/Skill/SectorRangeAttackSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/CameraFollow.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/Sub/S1006.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/InputManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/FollowState.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Battle/Skill/AttRange.cs" Line="89" Column="8" />
+      <File FileName="Assets/Scripts/Config/ItemConfig.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Battle.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Monster.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Loader.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Follower.cs" Line="1" Column="1" />
+      <File FileName="Assets/Plugins/FingerGestures/FingerGestures.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Item.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/BattleControllor.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/Sub/S1003.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/CharactorEffect.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Charactor.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Hero.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AlertBlock.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/Sub/S1002.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/NormalAttackSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/SkillManager.cs" Line="45" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/Sub/S2001.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/Sub/S2004.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/HpPop.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/AttRange.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/Sub/S2003.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/Sub/S2010.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/Sub/S2011.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/MissileAttackSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Battle/Skill/WalkerPathSkill.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UIManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/EventName.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/BattleState.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/SoundPlayer.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/MainUI.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/SoundManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UserInfoMgr.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Config/Config.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/GameEvent.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -30,9 +62,14 @@
           <Node name="Assembly-CSharp" expanded="True">
             <Node name="Scripts" expanded="True">
               <Node name="Battle" expanded="True">
-                <Node name="Skill" expanded="True" />
-                <Node name="Battle.cs" selected="True" />
+                <Node name="Skill" expanded="True">
+                  <Node name="Sub" expanded="True">
+                    <Node name="S1002.cs" selected="True" />
+                  </Node>
+                </Node>
               </Node>
+              <Node name="Config" expanded="True" />
+              <Node name="UI" expanded="True" />
             </Node>
           </Node>
         </State>
@@ -48,7 +85,9 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/Walker/Documents/BigHero/Assets/Scripts/Config/Config.cs" line="195" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

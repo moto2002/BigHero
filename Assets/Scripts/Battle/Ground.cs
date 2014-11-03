@@ -34,9 +34,13 @@ public class Ground : MonoBehaviour {
 				sr.transform.position = new Vector3(j * Constance.GRID_GAP + this.transform.position.x , -i * Constance.GRID_GAP + this.transform.position.y , 0);
 				sr.transform.parent = this.transform;
 
+				if(sprites == null){
+					sprites = Resources.LoadAll<Sprite>(@"Image/Ground/Ground");
+				}
+
 				sr.sprite = sprites[(int)mapGridConfig[i][j]];
 				Color c = sr.color;
-				c.a = 0.0f;
+				c.a = 0f;
 				sr.color = c;
 			}
 		}

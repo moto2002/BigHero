@@ -5,16 +5,20 @@ using System.Collections.Generic;
 
 public class Hero : Charactor{
 	
-	public float speed = 0.5f;
+	
+	private bool specSign = false;
+
+	public float speed = 0.7f;
 
 	public Follower follower;
-
 
 	[HideInInspector]
 	public Vector2 nextPosition = new Vector2(0,0); 
 	
 	[HideInInspector]
 	public float attackCD = 1f;
+	
+	private float skillCD = 1;
 
 	private Queue attackTagets = new Queue();
 
@@ -35,8 +39,7 @@ public class Hero : Charactor{
 
 	public Attribute attribute;
 
-	public GameObject hp_pop;
-
+	public CharactorEffect effectObject;
 	
 	[HideInInspector]
 	public MoveDirection _currentDirection;
@@ -50,38 +53,12 @@ public class Hero : Charactor{
 			return this._currentDirection;
 		}
 	}
-	
-	private MoveDirection _direction;
-	public MoveDirection direction{
-		set{
-//			if(value == MoveDirection.DOWN && currentDirection == MoveDirection.UP){
-//				return;
-//			}
-//			
-//			
-//			if(value == MoveDirection.UP && currentDirection == MoveDirection.DOWN){
-//				return;
-//			}
-//			
-//			
-//			if(value == MoveDirection.RIGHT && currentDirection == MoveDirection.LEFT){
-//				return;
-//			}
-//			
-//			
-//			if(value == MoveDirection.LEFT && currentDirection == MoveDirection.RIGHT){
-//				return;
-//			}
-			
-			this._direction = value;
-		}
-		get{return _direction;}
-	}
+
+	public MoveDirection direction;
 
 	private SkillConfig normalAttackSkill;
 
 	private ArrayList skills;
-
 
 	// Use this for initialization
 	void Start () {
@@ -124,35 +101,31 @@ public class Hero : Charactor{
 	
 	// Update is called once per frame
 	void Update () {
+		if( Constance.RUNNING == false){
+			return;
+		}
 
 		if(this.dead == true){
 			return;
 		}
 
-		FindFollower();
 		UpdateState();
+		SortY();
+
+		if(BattleControllor.state != BattleState.STATE_BATTLING){
+			return;
+		}
+
+		if(skillCD > 0){
+			skillCD -= Time.deltaTime;
+		}
+
+		UpdatePosition();
 		TryMove();
 		TryAttak();
 	}
 
-
-	private void FindFollower(){
-		ArrayList followers = Battle.GetFollowersByPoint(this.position);
-		
-		foreach(Follower follower in followers){
-			
-			if(this.position == follower.GetPoint()){
-				if(follower.state == FollowState.IDEL){
-
-					follower.state = FollowState.WAIT_CLOSE;
-					follower.SetFollowTarget(this);
-
-					follower.SetDirection(this.direction);
-				}
-			}
-		}
-	}
-
+	
 
 	private void UpdateState(){
 		if(this.animator == null){
@@ -171,7 +144,6 @@ public class Hero : Charactor{
 
 
 	private void UpdatePosition(){
-		this.SortY();
 		
 		int x = (int)Mathf.Round(this.transform.localPosition.x / Constance.GRID_GAP);
 		int y = -(int)Mathf.Round(this.transform.localPosition.y / Constance.GRID_GAP);
@@ -180,26 +152,42 @@ public class Hero : Charactor{
 			this.position.x = x;
 			this.position.y = y;
 			
-			Battle.UpdatePosition(this ,this.position);
+			BattleControllor.UpdatePosition(this ,this.position);
+
+			FindFollower();
+			TryPickUpItem();
 		}
 	}
 
+	private void FindFollower(){
+		ArrayList followers = BattleControllor.GetFollowersByPoint(this.position);
 
-	private void TryMove(){
-		if (Input.GetKeyDown (KeyCode.W)) {
-			//up
-			this.direction = MoveDirection.UP;
-		}else if (Input.GetKeyDown (KeyCode.S)) {
-			//down
-			this.direction = MoveDirection.DOWN;
-		}else if (Input.GetKeyDown (KeyCode.A)) {
-			//left
-			this.direction = MoveDirection.LEFT;
-		}else if (Input.GetKeyDown (KeyCode.D)) {
-			//right
-			this.direction = MoveDirection.RIGHT;
+		if(followers == null){
+			return;
 		}
 		
+		foreach(Follower follower in followers){
+			
+			if(follower.state == FollowState.IDEL){
+				follower.SetFollowTarget(this);
+			}
+		}
+	}
+	
+	
+	private void TryPickUpItem(){
+		ArrayList items = BattleControllor.GetItemByPoint(this.position);
+		
+		foreach(Item item in items){
+			
+			if(this.position == item.GetPoint()){
+				item.Pick(this);
+			}
+		}
+	}
+	
+
+	private void TryMove(){
 		if(Constance.RUNNING == false){
 			return;
 		}
@@ -208,23 +196,22 @@ public class Hero : Charactor{
 			return;
 		}
 
-
 		this.nextPosition = GetNextPosition();
 		
 		Vector2 nextPoint = BattleUtils.PositionToGrid(this.nextPosition.x , this.nextPosition.y);
 		
 		
-		if(Battle.IsMoveable(nextPoint) == false){
+		if(BattleControllor.IsMoveable(nextPoint) == false){
 			if(this.currentDirection != this.direction){
 				this.currentDirection = this.direction;
 				
-				if(this.follower != null)follower.SetNextPosition(this._transform.localPosition , this.direction);
+				if(this.follower != null)follower.SetNextPosition(this._transform.localPosition);
 			}
 			return;
 		}
 		
 		//下个格子中的物体
-		ArrayList monsterList = Battle.GetMonstersByPoint(nextPoint);
+		ArrayList monsterList = BattleControllor.GetMonstersByPoint(nextPoint);
 		
 		if(this.position != nextPoint && monsterList.Count > 0){
 			//前方有障碍物 需要停止
@@ -232,7 +219,7 @@ public class Hero : Charactor{
 			if(this.currentDirection != this.direction){
 				this.currentDirection = this.direction;
 				
-				if(this.follower != null)follower.SetNextPosition(this._transform.localPosition , this.direction);
+				if(this.follower != null)follower.SetNextPosition(this._transform.localPosition);
 			}
 			
 			return;
@@ -241,31 +228,22 @@ public class Hero : Charactor{
 		
 		float moveDistance = Time.deltaTime * speed;
 		
-		float toNextPositionDistance = GetToNextPositionDistance();
-		
-		if(toNextPositionDistance > moveDistance){
-			//not to point
-			Move(moveDistance);
-		}else{
-			
-			if(this.follower != null){
-				follower.SetNextPosition(this.nextPosition , this.direction);
-			}
-			
-			Move(toNextPositionDistance);
-			
+		if(this.currentDirection != this.direction){
 			this.currentDirection = this.direction;
-			Move(moveDistance - toNextPositionDistance);
+			
+			if(this.follower != null)follower.SetNextPosition(this._transform.localPosition);
 		}
+
+
+		Move(moveDistance);
+
 		
 		if(follower != null){
-			follower.move(moveDistance);
+			follower.Move(moveDistance);
 		}
 		
 
-		UpdatePosition();
 	}
-
 
 	public void Move(float distance){
 
@@ -301,31 +279,56 @@ public class Hero : Charactor{
 
 
 	private void NormalAttack(){
-		if(this.attackCD < 1){
-			this.attackCD += Time.deltaTime;
+		if(this.attackCD > 0){
+			this.attackCD -= Time.deltaTime;
 			return;
 		}
 		
-		ArrayList points  = AttRange.GetRangeByAttType(normalAttackSkill.attack_type , this.normalAttackSkill.range ,  this.attribute.volume , this.position);
+		ArrayList points  = AttRange.GetRangeByAttType(normalAttackSkill.attack_type , normalAttackSkill.range ,  this.attribute.volume , this.position , this.currentDirection);
 		
 		for(int i = 0 ; i < points.Count ; i++){
-			ArrayList monsters = Battle.GetMonstersByPoint((Vector2)points[i]);
+			ArrayList gameObjects = BattleControllor.GetGameObjectsByPosition((Vector2)points[i]);
 			
-			if(monsters.Count > 0){
-				this.attackCD = 0;
-				this.PlayAttack();
-				SkillManager.PlaySkill(this , normalAttackSkill);
+			for(int j = 0 ; j < gameObjects.Count ; j++){
+				
+				Charactor c = (Charactor)gameObjects[j];
+				
+				if(c.IsActive() == false){
+					continue;
+				}
+				
+				if(normalAttackSkill.target > 2){
+					if(c.GetType() == this.GetType()){
+						attackCD = normalAttackSkill.cd;
+						
+						normalAttackSkill.crit = attribute.crit;
+						SkillManager.PlaySkill(this , normalAttackSkill , c);
+						return;
+					}
+				}else{
+					if(c.GetType() != this.GetType()){
+						attackCD = normalAttackSkill.cd;
+						
+						normalAttackSkill.crit = attribute.crit;
+						SkillManager.PlaySkill(this , normalAttackSkill , c);
+						return;
+					}
+				}
 			}
 		}
 	}
 
 
 
-	public void playSkill(int index){
-		this.attackCD = 0;
+	public Skill playSkill(int index){
+		if(skillCD > 0){
+			return null;
+		}
 
-		SkillConfig skillConfig = Config.GetInstance().GetSkillCOnfig(3);
-		SkillManager.PlaySkill(this , skillConfig);
+		SkillConfig skillConfig = Config.GetInstance().GetSkillCOnfig(1006);
+		this.skillCD = 2;
+
+		return SkillManager.PlaySkill(this , skillConfig);
 	}
 
 
@@ -448,7 +451,13 @@ public class Hero : Charactor{
 
 
 	public override void PlayDead(){
-		Battle.HeroDead(this);
+		if(this.dead == true){
+			return;
+		}
+		
+		if(this.animator != null)this.animator.SetInteger("State" , 0);
+
+		BattleControllor.HeroDead(this);
 		this.dead = true;
 
 		Destroy(this.hpBar.gameObject);
@@ -461,20 +470,20 @@ public class Hero : Charactor{
 		this.model.PlayDead();
 	}
 
-	public override void ChangeHP(float hp){
+	public override void ChangeHP(float hp , bool crit){
 		this.attribute.hp -= hp;
 		
+		if(this.attribute.hp > this.attribute.maxHp){
+			this.attribute.hp = this.attribute.maxHp;
+		}
+
 		this.hpBar.SetHP(this.attribute.hp/this.attribute.maxHp);
 		
 		if(this.attribute.hp <= 0){
-			Battle.HeroDead(this);
+			BattleControllor.HeroDead(this);
 		}
 
-		GameObject go = (GameObject)Instantiate(this.hp_pop);
-		HpPop hpPop = go.GetComponent<HpPop>();
-		go.transform.parent = this.transform;
-		go.transform.localPosition = new Vector3(0,0,0);
-		hpPop.SetValue(hp);
+		this.effectObject.PlayNum((int)hp , crit);
 	}
 
 
@@ -520,7 +529,18 @@ public class Hero : Charactor{
 	}
 
 	public override bool IsActive (){
-		return true;
+		return this.dead == false;
+	}
+	
+	public override void SetSpec(bool b){
+		this.specSign = b;
+		this.model.SetSpec(b);
+
+	}
+
+
+	public override void PlayEffect(int type){
+		effectObject.PlayEffect(type);
 	}
 }
 

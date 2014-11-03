@@ -1,24 +1,17 @@
 fileFormatVersion: 2
-guid: 934388d6cab394103808e4bbbd07fcf1
+guid: 6c9bcc88fc4eb4aa18e99141c5687ceb
 TextureImporter:
   fileIDToRecycleName:
     21300000: 1
-    21300002: 1_0
-    21300004: 1_1
-    21300006: 1_2
-    21300008: 1_3
-    21300010: 1_4
-    21300012: 1_5
-    21300014: 1_6
-    21300016: 1_7
-    21300018: 1_8
-    21300020: 1_9
-    21300022: 1_10
-    21300024: 1_11
-    21300026: 1_12
-    21300028: 1_13
-    21300030: 1_14
-    21300032: 1_15
+    21300002: AlertBlock
+    21300004: AlertBlock_0
+    21300006: AlertBlock_1
+    21300008: AlertBlock_2
+    21300010: AlertBlock_3
+    21300012: AlertBlock_4
+    21300014: AlertBlock_5
+    21300016: AlertBlock_6
+    21300018: AlertBlock_7
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -60,87 +53,7 @@ TextureImporter:
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: 1_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 192
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_1
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 192
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_2
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 192
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_3
-      rect:
-        serializedVersion: 2
-        x: 192
-        y: 192
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_4
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_5
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_6
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_7
-      rect:
-        serializedVersion: 2
-        x: 192
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_8
+    - name: AlertBlock_0
       rect:
         serializedVersion: 2
         x: 0
@@ -150,7 +63,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_9
+    - name: AlertBlock_1
       rect:
         serializedVersion: 2
         x: 64
@@ -160,7 +73,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_10
+    - name: AlertBlock_2
       rect:
         serializedVersion: 2
         x: 128
@@ -170,7 +83,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_11
+    - name: AlertBlock_3
       rect:
         serializedVersion: 2
         x: 192
@@ -180,7 +93,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_12
+    - name: AlertBlock_4
       rect:
         serializedVersion: 2
         x: 0
@@ -190,7 +103,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_13
+    - name: AlertBlock_5
       rect:
         serializedVersion: 2
         x: 64
@@ -200,7 +113,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_14
+    - name: AlertBlock_6
       rect:
         serializedVersion: 2
         x: 128
@@ -210,7 +123,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: 1_15
+    - name: AlertBlock_7
       rect:
         serializedVersion: 2
         x: 192

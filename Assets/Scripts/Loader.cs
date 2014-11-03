@@ -8,9 +8,6 @@ public class Loader  {
 		if(Application.platform == RuntimePlatform.Android){
 			FileInfo fileInfo = new FileInfo(Application.persistentDataPath + "/" + fileName + ".json" );
 
-			
-			Debug.Log("kkkk " +  Application.persistentDataPath + "/" + fileName + ".json" );
-			Debug.Log("kkkk " +  fileInfo.Exists);
 			if(fileInfo.Exists == true){
 				StreamReader sr = fileInfo.OpenText();
 				
@@ -19,7 +16,7 @@ public class Loader  {
 				while ((read = sr.ReadLine()) != null){
 					text += read;
 				}
-				Debug.Log("kkkk " +  text);
+
 				return text;
 			}
 		}

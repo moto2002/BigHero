@@ -3,6 +3,13 @@ using System.Collections;
 
 public class BattleInfo{
 
-	public static int id = 1;
+	public CopyConfig copyConfig;
+
+	public int groundIndex;
+
+	public int heroId;
+
+	public int heroLevel;
+
 
 }

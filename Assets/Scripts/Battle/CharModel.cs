@@ -30,8 +30,6 @@ public class CharModel : SpriteAnimation {
 
 	[HideInInspector]
 	public int model;
-
-	private float deadTime = 0;
 	
 	private bool stateLock = false;
 
@@ -294,13 +292,6 @@ public class CharModel : SpriteAnimation {
 			this.Stop();
 		}
 
-		if( this.currentState == State.DEAD ){
-			deadTime += Time.deltaTime;
-
-			if(deadTime > 1.5){
-				Destroy(this.gameObject.transform.parent.gameObject);
-			}
-		}
 	}
 
 
@@ -326,6 +317,9 @@ public class CharModel : SpriteAnimation {
 
 
 	public void PlayAttack(bool b = true){
+		if(this._currentState == State.DEAD){
+			return;
+		}
 
 		attType = 1;
 		_currentState = State.ATTACK;
@@ -352,8 +346,11 @@ public class CharModel : SpriteAnimation {
 
 
 	public void PlaySkillAttack(bool b = true){
-		attType = 2;
+		if(this._currentState == State.DEAD){
+			return;
+		}
 
+		attType = 2;
 		_currentState = State.ATTACK;
 
 		if(b == true){

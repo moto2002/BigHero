@@ -3,6 +3,8 @@ using System.Collections;
 using LitJson;
 
 public class Follower: Charactor{
+	
+	private bool specSign = false;
 
 	public Object prev;
 	public Follower follower;
@@ -10,10 +12,11 @@ public class Follower: Charactor{
 	public SpriteRenderer spriteRenderer;
 	public HPBar hpBar;
 
-	private Queue paths;
-	private Queue directions;
-	private Vector3 nextPosition;
+	public int followIndex = 0;
 
+	public Queue paths;
+
+	private Vector3 nextPosition;
 
 	[HideInInspector]
 	private MoveDirection currentDirection;
@@ -21,8 +24,6 @@ public class Follower: Charactor{
 	private Transform _transform;
 
 	private Vector2 position;
-
-	private GameObject _moveTarget;
 	
 	private float skillCD = 1f;
 	private float normalSkillCD = 0f;
@@ -48,9 +49,11 @@ public class Follower: Charactor{
 
 	private SkillConfig normalAttackSkill;
 
+	public CharactorEffect effectObject;
+
 	void Start () {
 		paths = new Queue();
-		directions= new Queue();
+
 		nextPosition.z = -1;
 
 		_transform = this.gameObject.transform;
@@ -79,14 +82,13 @@ public class Follower: Charactor{
 			this.position.x = x;
 			this.position.y = y;
 
-			Battle.UpdatePosition(this ,this.position);
+			BattleControllor.UpdatePosition(this ,this.position);
 		}
 
 		
 		if(this.dead == true){
 			return;
 		}
-
 
 		UpdateState();
 		TryAttak();
@@ -118,24 +120,45 @@ public class Follower: Charactor{
 			normalSkillCD -= Time.deltaTime;
 			return;
 		}
+
+		if(this.state != FollowState.FOLLOW){
+			return;
+		}
 		
 		if(this.model.currentState == CharModel.State.ATTACK){
 			return;
 		}
 		
 		
-		ArrayList points  = AttRange.GetRangeByAttType(this.normalAttackSkill.attack_type , this.normalAttackSkill.range ,  this.attribute.volume , this.position);
+		ArrayList points  = AttRange.GetRangeByAttType(this.normalAttackSkill.attack_type , this.normalAttackSkill.range ,  this.attribute.volume , this.position , this.currentDirection);
 		
 		for(int i = 0 ; i < points.Count ; i++){
-			ArrayList gameObjects = Battle.GetGameObjectsByPosition((Vector2)points[i]);
+			ArrayList gameObjects = BattleControllor.GetGameObjectsByPosition((Vector2)points[i]);
 			
 			for(int j = 0 ; j < gameObjects.Count ; j++){
 				
 				Charactor c = (Charactor)gameObjects[j];
 				
-				if(c.IsActive() == true && c.GetType() != this.GetType()){
-					normalSkillCD = 1;
-					SkillManager.PlaySkill(this , normalAttackSkill , c);
+				if(c.IsActive() == false){
+					continue;
+				}
+				
+				if(normalAttackSkill.target > 2){
+					if(c.GetType() == this.GetType()){
+						normalSkillCD = normalAttackSkill.cd;
+						
+						normalAttackSkill.crit = attribute.crit;
+						SkillManager.PlaySkill(this , normalAttackSkill , c);
+						return;
+					}
+				}else{
+					if(c.GetType() != this.GetType()){
+						normalSkillCD = normalAttackSkill.cd;
+						
+						normalAttackSkill.crit = attribute.crit;
+						SkillManager.PlaySkill(this , normalAttackSkill , c);
+						return;
+					}
 				}
 			}
 			
@@ -149,14 +172,10 @@ public class Follower: Charactor{
 			this.skillCD -= Time.deltaTime;
 			return;
 		}
-		
-		if(skills.Count == 0){
-			return;
-		}
-		
-		if(this.model.currentState == CharModel.State.ATTACK){
-			return;
-		}
+
+		if(skills == null)return;
+		if(skills.Count == 0)return;
+		if(this.model.currentState == CharModel.State.ATTACK)return;
 		
 		SkillItem skillItem = null;
 		
@@ -217,115 +236,103 @@ public class Follower: Charactor{
 	}
 
 
-	public void move(float distance){
-
-		if(dead == true){
+	
+	public void Move(float distance){
+		
+		if(this.state == FollowState.DEAD){
 			return;
 		}
 
+		float d = GetTotalDistance(BattleControllor.hero.transform.localPosition , this.transform.localPosition);
 
-		if(this.state == FollowState.WAIT_CLOSE){
-			//wait the targe move
-
-
-			if(this._moveTarget.tag == "Hero"){
-				Hero hero = this._moveTarget.GetComponent<Hero>();
-
-				if(hero.GetPoint() == this.position){
-					this.state = FollowState.WAIT_FOLLOW;
-				}
-				
-			}else if(this._moveTarget.tag == "Follower"){
-				Follower f = this._moveTarget.GetComponent<Follower>();
-
-				if(f.GetPoint() == this.position){
-					this.state = FollowState.WAIT_FOLLOW;
-				}
-			}
-
-		}else if(this.state == FollowState.WAIT_FOLLOW){
-			float d = GetMoveDistance(this._moveTarget, this.gameObject);
-
-
-			if(d >= Constance.GRID_GAP + 0.1f){
-				this.state = FollowState.FOLLOW;
-				
-				if(this._moveTarget.tag == "Hero"){
-
-					Hero hero = this._moveTarget.GetComponent<Hero>();
-					this.SetDirection(hero.currentDirection);
-
-				}else if(this._moveTarget.tag == "Follower"){
-
-					Follower f = this._moveTarget.GetComponent<Follower>();
-					this.SetDirection(f.GetDirection());
-				}
-				
-				this.running = true;
-				this.PlayAnimation();
-				this._moveTarget = null;
-			}else{
+		if(this.state == FollowState.WAIT_FOLLOW){
+			if(d < this.followIndex * Constance.GRID_GAP){
 				return;
 			}
+
+			this.running = true;
+			this.PlayAnimation();
+			
+			d = GetTotalDistance(BattleControllor.hero.transform.localPosition , this.transform.localPosition);
+
+			this.state = FollowState.FOLLOW;
+			this.running = true;
+			this.PlayAnimation();
 		}
 
-
-		if(this.running == false){
-			//play standing animation
-			return;
-		}
-
-		float d2 = GetMoveDistance(((MonoBehaviour)this.prev).gameObject, this.gameObject);
-
-		if(d2 > Constance.GRID_GAP + 0.1f){
-
-			if(d2 - Constance.GRID_GAP + 0.1f > 0.008f){
-				distance += 0.008f;
-			}else{
-				distance += d2 - Constance.GRID_GAP + 0.1f;
-			}
+		if(d > this.followIndex * Constance.GRID_GAP + 0.02){
+			distance += 0.002f;
+		}else if(d < this.followIndex * Constance.GRID_GAP){
+			distance -= 0.002f;
 		}
 
 		if(nextPosition.z == -1 && this.paths.Count > 0){
-			this.nextPosition = (Vector3)this.paths.Dequeue();
-			this.nextDirection = (MoveDirection)this.directions.Dequeue();
+			this.currentDirection = FindDirection();
+			this.model.direction = this.currentDirection;
 		}
-
+		
 		if(nextPosition.z == -1){
-			_move(distance);
+			_Move(distance);
 		}else{
-
+			
 			float toNext = GetToNextPositionDistance();
 
 			while(distance >  toNext){
+				
+				_Move(toNext);
 
-				_move(toNext);
 				distance -= toNext;
 
-				this.currentDirection = this.nextDirection;
-				this.model.direction = this.currentDirection;
-
 				if(this.paths.Count > 0){
-					this.nextPosition = (Vector3)this.paths.Dequeue();
-					this.nextDirection = (MoveDirection)this.directions.Dequeue();
+					this.currentDirection = FindDirection();
+					this.model.direction = this.currentDirection;
 				}
-
+				
 				toNext = GetToNextPositionDistance();
-
+				
 				if(toNext == 0){
 					this.nextPosition.z = -1;
+					this.currentDirection = BattleControllor.hero.GetDirection();
+					this.model.direction = this.currentDirection;
 					break;
 				}
 			}
-
-			_move(distance);
+			
+			_Move(distance);
 		}
-
+		
 		
 		
 		if(this.follower != null){
-			this.follower.move (distance);
+			this.follower.Move (distance);
 		}
+	}
+
+	private float GetTotalDistance(Vector3 point1 , Vector3 point3){
+		
+		float distance = 0f;
+		
+		foreach(Vector3 point2 in paths){
+			
+			distance += GetDistance(point1 , point2);
+			point1 = point2;
+		}
+
+		if(this.nextPosition.z != -1){
+			distance += GetDistance(point1 , this.nextPosition);
+
+			point1 =  this.nextPosition;
+		}
+		
+		distance += GetDistance(point1 , point3);
+
+		
+		return distance;
+	}
+	
+	
+	private  float GetDistance(Vector3 v1 , Vector3 v2){
+		return Mathf.Abs(v1.y - v2.y) + Mathf.Abs(v1.x - v2.x);
 	}
 
 	private float GetToNextPositionDistance(){
@@ -333,17 +340,48 @@ public class Follower: Charactor{
 		switch(this.currentDirection){
 		case MoveDirection.DOWN:
 		case MoveDirection.UP:
-			return Mathf.Abs(this.nextPosition.y - this.transform.localPosition.y);
+			return Mathf.Abs(this.nextPosition.y - this.transform.position.y);
 		case MoveDirection.LEFT:
 		case MoveDirection.RIGHT:
-			return Mathf.Abs(this.nextPosition.x - this.transform.localPosition.x);
+			return Mathf.Abs(this.nextPosition.x - this.transform.position.x);
 		}
 		
 		return 0f;
 	}
 
 
-	private void _move(float distance){
+	private MoveDirection FindDirection(){
+		Vector3 next = (Vector3)this.paths.Peek();
+		Vector3 localPosition = transform.localPosition;
+
+		if(localPosition.x != next.x && localPosition.y != next.y){
+			next = new Vector3(localPosition.x , next.y);
+		}else{
+			next = (Vector3)this.paths.Dequeue();
+		}
+
+		nextPosition = next;
+
+		if(this.nextPosition.x == localPosition.x){
+			if(this.nextPosition.y > localPosition.y){
+				return MoveDirection.UP;
+			}else{
+				return MoveDirection.DOWN;
+			}
+		
+		}else{
+			if(this.nextPosition.x > localPosition.x){
+				return MoveDirection.RIGHT;
+			}else{
+				return MoveDirection.LEFT;
+			}
+		}
+
+		return MoveDirection.DOWN;
+	}
+
+
+	private void _Move(float distance){
 
 		Vector3 v = this._transform.localPosition;
 
@@ -370,28 +408,59 @@ public class Follower: Charactor{
 	public void SetFollowTarget(Hero hero){
 
 		if(hero.follower == null){
-			this._moveTarget = hero.gameObject;
 			hero.follower = this;
 			this.prev = hero;
+
+			followIndex = 1;
+
 		}else{
 			Follower f = hero.follower;
-			
+
+			followIndex = 2;
+
 			while(f.follower != null){
 				f = f.follower;
+				followIndex++;
 			}
-			this._moveTarget = f.gameObject;
+
+
 			f.follower = this;
 			this.prev = f;
 		}
+
+		
+		this.state = FollowState.WAIT_FOLLOW;
+
+		Vector3 heroPosition = hero.gameObject.transform.localPosition;
+		Vector3 midPosition = Vector3.zero;
+
+		switch(hero.GetDirection()){
+		case MoveDirection.DOWN:
+			midPosition = new Vector3(this.transform.localPosition.x , heroPosition.y , 0);
+			break;
+		case MoveDirection.UP:
+			midPosition = new Vector3(this.transform.localPosition.x , heroPosition.y , 0);
+			break;
+		case MoveDirection.LEFT:
+			midPosition = new Vector3(heroPosition.x , this.transform.localPosition.y);
+			break;
+		case MoveDirection.RIGHT:
+			midPosition = new Vector3(heroPosition.x , this.transform.localPosition.y);
+			break;
+		}
+
+		
+		SetNextPosition(midPosition);
+		SetNextPosition(heroPosition);
 	}
 
-	public void SetNextPosition(Vector3 position , MoveDirection direction){
+	public void SetNextPosition(Vector3 position){
+
 		if(this.follower != null){
-			this.follower.SetNextPosition (position , direction);
+			this.follower.SetNextPosition (position);
 		}
 
 		paths.Enqueue(position);
-		directions.Enqueue(direction);
 	}
 
 
@@ -483,18 +552,37 @@ public class Follower: Charactor{
 		animator.SetInteger("State" , 1); 
 	}
 
-	public override void ChangeHP(float hp){
+	public override void ChangeHP(float hp , bool crit){
 		this.attribute.hp -= hp;
+
+		if(this.attribute.hp > this.attribute.maxHp){
+			this.attribute.hp = this.attribute.maxHp;
+		}
 		
 		this.hpBar.SetHP(this.attribute.hp/this.attribute.maxHp);
 		
 		if(this.attribute.hp <= 0){
 			PlayDead();
 		}
+
+		this.effectObject.PlayNum((int)hp , crit);
 	}
 
 	public override void PlayDead(){
+		if(this.dead == true){
+			return;
+		}
+
+		if(this.animator != null)this.animator.SetInteger("State" , 0);
+
 		dead = true;
+
+		Follower f = this;
+
+		while(f.follower != null){
+			f.follower.followIndex -= 1;
+			f = f.follower;
+		}
 
 		if(this.prev is Hero){
 			((Hero)this.prev).follower = this.follower;
@@ -507,18 +595,37 @@ public class Follower: Charactor{
 		}
 
 		this.state = FollowState.DEAD;
-		Battle.RemoveFollower(this);
+		BattleControllor.RemoveFollower(this);
 
 		if(this.model == null){
 			return;
 		}
 
 		this.model.PlayDead();
+		
+		StartCoroutine(Remove()); 
+	}
+
+	
+	
+	private IEnumerator Remove(){
+		yield return new WaitForSeconds(1.5f);
+		Destroy(this.gameObject);
 	}
 	
 	
 	public override Vector2 GetPoint(){
 		return this.position;
+	}
+
+	public override void SetSpec(bool b){
+		this.specSign = b;
+
+		if(b){
+			this.model.Play();
+		}else{
+			this.model.Stop();
+		}
 	}
 
 
@@ -561,6 +668,20 @@ public class Follower: Charactor{
 		}
 
 		return false;
+	}
+
+	public bool HasNextPoint(){
+
+		if(this.nextPosition.z == -1){
+			return false;
+		}
+
+		return true;
+	}
+
+	public void ResetPostion(){
+		paths = new Queue();
+		nextPosition = new Vector3(0,0,-1);
 	}
 
 

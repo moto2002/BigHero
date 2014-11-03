@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PointFlyAttackSkill : Skill {
+public class PointFlyAttackSkill {
+	
+	private bool specSign = false;
 	
 	private Charactor attackOne;
 	
@@ -24,6 +26,8 @@ public class PointFlyAttackSkill : Skill {
 	private Vector3 attackOff = Vector2.zero;
 
 	private SkillConfig skillConfig;
+
+	private Vector3 targetPoint;
 	
 	public PointFlyAttackSkill(Charactor attackOne , SkillConfig skillConfig){
 		this.attackOne = attackOne;
@@ -31,7 +35,7 @@ public class PointFlyAttackSkill : Skill {
 		ArrayList points  = AttRange.GetRangeByAttType(skillConfig.attack_type , skillConfig.range ,  attackOne.GetAttribute().volume , attackOne.GetPoint() , attackOne.GetDirection());
 		
 		for(int i = 0 ; i < points.Count ; i++){
-			ArrayList objects = Battle.GetGameObjectsByPosition((Vector2)points[i]);
+			ArrayList objects = BattleControllor.GetGameObjectsByPosition((Vector2)points[i]);
 			
 			for(int j = 0 ; j < objects.Count ; j++){
 				Charactor c = objects[j] as Charactor;
@@ -66,12 +70,28 @@ public class PointFlyAttackSkill : Skill {
 	}
 	
 	public void Update(){
+		if(Constance.SPEC_RUNNING == false && Constance.RUNNING == false){
+			return;
+		}else if(Constance.SPEC_RUNNING == true && this.specSign == false){
+			return;
+		}
+
 
 		if(this.end == true){
 			return;
 		}
 
+		
+		if(attackedOne.IsActive() == true){
+			targetPoint = attackedTransfrom.position + attackedOff;
+		}
+
 		if(skillObject == null && this.attackOne.IsInAttIndex()){
+
+			if(attackOne.IsActive() == false){
+				end = true;
+				return;
+			}
 
 			GameObject gameObject = (GameObject)MonoBehaviour.Instantiate(SkillObject_pre);
 			
@@ -90,16 +110,23 @@ public class PointFlyAttackSkill : Skill {
 		}
 
 		float d1 = Time.deltaTime * speed;
-		float d2 = Vector3.Distance(skillTransfrom.position , attackedTransfrom.position + attackedOff);
+		float d2 = Vector3.Distance(skillTransfrom.position , targetPoint);
 
 
 		if(d1 > d2){
 			MonoBehaviour.Destroy(this.skillObject.gameObject);
 			this.end = true;
-
-			float damage = Battle.Attack(attackOne.GetAttribute() , attackedOne.GetAttribute());
 			
-			attackedOne.ChangeHP(damage);
+			bool crit = BattleControllor.Crit(skillConfig.crit);
+			float damage = BattleControllor.Attack(attackOne.GetAttribute() , attackedOne.GetAttribute() , skillConfig.demageratio , skillConfig.b , crit);
+			
+			attackedOne.ChangeHP(damage , crit);
+
+//			if(skillConfig.sound2 != 0){
+//				AudioClip ac = Resources.Load<AudioClip>("Audio/Skill/" + skillConfig.sound2);
+//				attackedOne.audio.clip = ac;
+//				attackedOne.audio.Play();
+//			}
 			
 			if(attackedOne.GetAttribute().hp > 0){
 				attackedOne.PlayAttacked();
@@ -111,15 +138,20 @@ public class PointFlyAttackSkill : Skill {
 		}
 
 		skillTransfrom.eulerAngles = new Vector3(0 , 0 , GetAngle()); 
-		skillTransfrom.position = Vector3.MoveTowards(skillTransfrom.position , attackedTransfrom.position + attackedOff , d1);
+		skillTransfrom.position = Vector3.MoveTowards(skillTransfrom.position , targetPoint , d1);
 	}
 
 
 	private float GetAngle(){
 
-		return Mathf.Atan2(attackedTransfrom.position.y + attackedOff.y  - skillTransfrom.position.y , attackedTransfrom.position.x - skillTransfrom.position.x + attackedOff.y) * 180 / Mathf.PI ;
+		return Mathf.Atan2(targetPoint.y  - skillTransfrom.position.y , targetPoint.x - skillTransfrom.position.x + attackedOff.y) * 180 / Mathf.PI ;
 	}
 	
+	
+	public void SetSpec(bool b){
+		this.specSign = b;
+	}
+
 	public bool IsEnd(){
 		return end;
 	}

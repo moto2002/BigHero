@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MissileAttackSkill : Skill {
+public class MissileAttackSkill  {
+	
+	private bool specSign = false;
 
 	// Use this for initialization
 	public void Start () {
@@ -12,6 +14,11 @@ public class MissileAttackSkill : Skill {
 	public void Update () {
 	
 	}
+	
+	public void SetSpec(bool b){
+		this.specSign = b;
+	}
+
 
 	public bool IsEnd(){
 		return false;

@@ -1,8 +1,7 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class AttRange {
-	
 
 	public static ArrayList GetRangeByAttType(int type , int range , int volume , Vector2 zeroPoint , MoveDirection direction = MoveDirection.UP){
 
@@ -34,6 +33,8 @@ public class AttRange {
 		case 9:
 			return HalfRectRange(range , volume , zeroPoint , direction);
 			break;
+		case 10:
+			return AllPoint();
 		}
 
 		return new ArrayList();
@@ -106,8 +107,8 @@ public class AttRange {
 		ArrayList rangs = new ArrayList();
 
 
-		for(int i = 0; i < Battle.v ; i++){
-			for(int j = 0 ; j < Battle.h ; j++){
+		for(int i = 0; i < BattleControllor.v ; i++){
+			for(int j = 0 ; j < BattleControllor.h ; j++){
 
 				if(j >= minx && j <= maxx && i >= miny && i <= maxy){
 					continue;
@@ -306,6 +307,27 @@ public class AttRange {
 		}
 
 		return rangs;
+	}
+
+
+	private static ArrayList allPointList;
+
+	private static ArrayList AllPoint(){
+
+		if(allPointList != null){
+			return allPointList;
+		}
+
+		allPointList = new ArrayList();
+
+		for(int i = 0 ; i < BattleControllor.h ; i++){
+			for(int j = 0 ; j < BattleControllor.v ; j++){
+				
+				allPointList.Add(new Vector2(i ,j));
+			}
+		}
+
+		return allPointList;
 	}
 
 }

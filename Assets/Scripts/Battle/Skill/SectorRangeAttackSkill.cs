@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SectorRangeAttackSkill : Skill {
-
+public class SectorRangeAttackSkill {
+	
+	private bool specSign = false;
 
 	private Charactor attackOne;
 
@@ -29,6 +30,12 @@ public class SectorRangeAttackSkill : Skill {
 
 
 	public void Update () {
+		if(Constance.SPEC_RUNNING == false && Constance.RUNNING == false){
+			return;
+		}else if(Constance.SPEC_RUNNING == true && this.specSign == false){
+			return;
+		}
+
 		if(end == true){
 			return;
 		}
@@ -68,16 +75,17 @@ public class SectorRangeAttackSkill : Skill {
 			
 			for(int i = 0 ; i < range.Count ; i ++){
 				
-				ArrayList objects = Battle.GetGameObjectsByPosition((Vector2)range[i]);
+				ArrayList objects = BattleControllor.GetGameObjectsByPosition((Vector2)range[i]);
 				
 				for(int j = 0 ; j < objects.Count ; j++){
 					Charactor c = objects[j] as Charactor;
 					
 					if(c.GetType() != this.attackOne.GetType() && c.IsActive() == true){
 						
-						float damage = Battle.Attack(attackOne.GetAttribute() , c.GetAttribute());
+						bool crit = BattleControllor.Crit(skillConfig.crit);
+						float damage = BattleControllor.Attack(attackOne.GetAttribute() , c.GetAttribute() , skillConfig.demageratio , skillConfig.b , crit);
 						
-						c.ChangeHP(damage);
+						c.ChangeHP(damage, crit);
 						
 						if(c.GetAttribute().hp > 0){
 							c.PlayAttacked();
@@ -105,6 +113,11 @@ public class SectorRangeAttackSkill : Skill {
 		}
 
 	}
+	
+	public void SetSpec(bool b){
+		this.specSign = b;
+	}
+
 
 	public bool IsEnd(){
 		return end;

@@ -1,0 +1,115 @@
+fileFormatVersion: 2
+guid: 7fc835c12f0bc462da1ae8a3131e20fb
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: 1
+    21300002: ExitEffect
+    21300004: ExitEffect_0
+    21300006: ExitEffect_1
+    21300008: ExitEffect_2
+    21300010: ExitEffect_3
+    21300012: ExitEffect_4
+    21300014: ExitEffect_5
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 1024
+  textureSettings:
+    filterMode: -1
+    aniso: 1
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: ExitEffect_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 181
+        width: 104
+        height: 181
+      alignment: 9
+      pivot: {x: .479999989, y: .159408227}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ExitEffect_1
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 181
+        width: 104
+        height: 181
+      alignment: 9
+      pivot: {x: .479999989, y: .159408197}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ExitEffect_2
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 181
+        width: 104
+        height: 181
+      alignment: 9
+      pivot: {x: .479999989, y: .159408197}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ExitEffect_3
+      rect:
+        serializedVersion: 2
+        x: 312
+        y: 181
+        width: 104
+        height: 181
+      alignment: 9
+      pivot: {x: .479999989, y: .159408197}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ExitEffect_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1
+        width: 104
+        height: 181
+      alignment: 9
+      pivot: {x: .479999989, y: .159408197}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ExitEffect_5
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 0
+        width: 104
+        height: 181
+      alignment: 9
+      pivot: {x: .479999989, y: .159408197}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 

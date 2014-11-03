@@ -3,7 +3,9 @@ using System.Collections;
 
 
 //unfinshed
-public class RandomAttackSkill : Skill {
+public class RandomAttackSkill {
+	
+	private bool specSign = false;
 
 	private bool end = false;
 	
@@ -58,7 +60,7 @@ public class RandomAttackSkill : Skill {
 
 			v = (Vector2)r[index];
 
-			if(v.x >= Battle.h || v.x < 0 || v.y >= Battle.v || v.y < 0){
+			if(v.x >= BattleControllor.h || v.x < 0 || v.y >= BattleControllor.v || v.y < 0){
 				i--;
 				continue;
 			}
@@ -80,6 +82,12 @@ public class RandomAttackSkill : Skill {
 	}
 	
 	public void Update (){
+		if(Constance.SPEC_RUNNING == false && Constance.RUNNING == false){
+			return;
+		}else if(Constance.SPEC_RUNNING == true && this.specSign == false){
+			return;
+		}
+
 		if(end == true){
 			return;
 		}
@@ -112,21 +120,33 @@ public class RandomAttackSkill : Skill {
 				skillObject.res = this.skillConfig.res;
 				skillObject.loop = 1;
 				skillObject.transform.localScale = new Vector3(0.5f, 0.5f , 0);
+//				if(i == 0){
+//					skillObject.sound = skillConfig.sound1;
+//				}
 				
 				skillObject.transform.position = BattleUtils.GridToPosition((Vector2)range[i]);
 				
 				skillObjects.Add(skillObject);
 				
-				ArrayList objects = Battle.GetGameObjectsByPosition((Vector2)range[i]);
+				ArrayList objects = BattleControllor.GetGameObjectsByPosition((Vector2)range[i]);
 				
 				for(int j = 0 ; j < objects.Count ; j++){
 					Charactor c = objects[j] as Charactor;
 					
 					if(c.GetType() != this.attackOne.GetType() && c.IsActive() == true){
 						
-						float damage = Battle.Attack(attackOne.GetAttribute() , c.GetAttribute());
+						bool crit = BattleControllor.Crit(skillConfig.crit);
+						float damage = BattleControllor.Attack(attackOne.GetAttribute() , c.GetAttribute() , skillConfig.demageratio , skillConfig.b , crit);
 						
-						c.ChangeHP(damage);
+						c.ChangeHP(damage , crit);
+
+//						if(skillConfig.sound2 != 0){
+//							AudioClip ac = Resources.Load<AudioClip>("Audio/Skill/" + skillConfig.sound2);
+//							if(ac != null){
+//								c.audio.clip = ac;
+//								c.audio.Play();
+//							}
+//						}
 						
 						if(c.GetAttribute().hp > 0){
 							c.PlayAttacked();
@@ -163,6 +183,11 @@ public class RandomAttackSkill : Skill {
 			}
 		}
 	}
+	
+	public void SetSpec(bool b){
+		this.specSign = b;
+	}
+
 	
 	public bool IsEnd(){
 		return end;

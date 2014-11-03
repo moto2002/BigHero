@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using LitJson;
 
 public class Monster : Charactor{
 
+	
+	private bool specSign = false;
 
 	public GameObject model;
 
@@ -22,6 +24,10 @@ public class Monster : Charactor{
 	private int pathIndex = 0;
 
 	private float speed;
+
+	public int dropItemId;
+
+	public int dropOdds;
 	
 	private PathPoint lastPathPoint;
 	private PathPoint nextPathPoint;
@@ -34,8 +40,6 @@ public class Monster : Charactor{
 
 	private float skillCD = 1;
 	private float normalSkillCD = 0;
-	
-	public GameObject hp_pop;
 
 	private bool dead = false;
 
@@ -50,6 +54,8 @@ public class Monster : Charactor{
 	private int currentSkillIndex;
 
 	private int sumOfSkillOdds;
+
+	public CharactorEffect effectObject;
 
 	// Use this for initialization
 	void Start () {
@@ -68,10 +74,12 @@ public class Monster : Charactor{
 	
 	// Update is called once per frame
 	void Update () {
-		if(Constance.RUNNING == false){
+		if(Constance.SPEC_RUNNING == false && Constance.RUNNING == false){
+			return;
+		}else if(Constance.SPEC_RUNNING == true && this.specSign == false){
 			return;
 		}
-		
+
 		if(teleport != null){
 
 			if(teleport.IsEnd() == true){
@@ -111,7 +119,7 @@ public class Monster : Charactor{
 			this.position.x = x;
 			this.position.y = y;
 			
-			Battle.UpdatePosition(this ,this.position , this.attribute.volume);
+			BattleControllor.UpdatePosition(this ,this.position , this.attribute.volume);
 		}
 	}
 
@@ -192,11 +200,11 @@ public class Monster : Charactor{
 
 				v.x = v.x + i;
 
-				if(Battle.IsMoveable(v) == false){
+				if(BattleControllor.IsMoveable(v) == false){
 					return false;
 				}
 
-				if(Battle.GetGameObjectsByPosition(v).Count > 0){
+				if(BattleControllor.GetGameObjectsByPosition(v).Count > 0){
 					return false;
 				}
 			}
@@ -209,11 +217,11 @@ public class Monster : Charactor{
 			for(int i = 0 ; i < this.attribute.volume ; i++){
 				v.x = v.x + i;
 				
-				if(Battle.IsMoveable(v) == false){
+				if(BattleControllor.IsMoveable(v) == false){
 					return false;
 				}
 
-				if(Battle.GetGameObjectsByPosition(v).Count > 0){
+				if(BattleControllor.GetGameObjectsByPosition(v).Count > 0){
 					return false;
 				}
 			}
@@ -227,11 +235,11 @@ public class Monster : Charactor{
 			for(int i = 0 ; i < this.attribute.volume ; i++){
 				v.y = v.y + i;
 				
-				if(Battle.IsMoveable(v) == false){
+				if(BattleControllor.IsMoveable(v) == false){
 					return false;
 				}
 
-				if(Battle.GetGameObjectsByPosition(v).Count > 0){
+				if(BattleControllor.GetGameObjectsByPosition(v).Count > 0){
 					return false;
 				}
 			}
@@ -247,11 +255,11 @@ public class Monster : Charactor{
 			for(int i = 0 ; i < this.attribute.volume ; i++){
 				v.y = v.y + i;
 				
-				if(Battle.IsMoveable(v) == false){
+				if(BattleControllor.IsMoveable(v) == false){
 					return false;
 				}
 
-				if(Battle.GetGameObjectsByPosition(v).Count > 0){
+				if(BattleControllor.GetGameObjectsByPosition(v).Count > 0){
 					return false;
 				}
 			}
@@ -283,18 +291,34 @@ public class Monster : Charactor{
 		ArrayList points  = AttRange.GetRangeByAttType(normalAttackSkill.attack_type , this.normalAttackSkill.range ,  this.attribute.volume , this.position , this.currentDirection);
 		
 		for(int i = 0 ; i < points.Count ; i++){
-			ArrayList gameObjects = Battle.GetGameObjectsByPosition((Vector2)points[i]);
+			ArrayList gameObjects = BattleControllor.GetGameObjectsByPosition((Vector2)points[i]);
 
 			for(int j = 0 ; j < gameObjects.Count ; j++){
 
 				Charactor c = (Charactor)gameObjects[j];
 
-				if(c.IsActive() == true && c.GetType() != this.GetType()){
-					normalSkillCD = 1;
-					SkillManager.PlaySkill(this , normalAttackSkill , c);
+				if(c.IsActive() == false){
+					continue;
+				}
+
+				if(normalAttackSkill.target > 2){
+					if(c.GetType() == this.GetType()){
+						normalSkillCD = normalAttackSkill.cd;
+						
+						normalAttackSkill.crit = attribute.crit;
+						SkillManager.PlaySkill(this , normalAttackSkill , c);
+						return;
+					}
+				}else{
+					if(c.GetType() != this.GetType()){
+						normalSkillCD = normalAttackSkill.cd;
+						
+						normalAttackSkill.crit = attribute.crit;
+						SkillManager.PlaySkill(this , normalAttackSkill , c);
+						return;
+					}
 				}
 			}
-
 		}
 	}
 
@@ -510,20 +534,21 @@ public class Monster : Charactor{
 	}
 
 
-	public override void ChangeHP(float hp){
+	public override void ChangeHP(float hp , bool crit){
+		if(this.dead){
+			return;
+		}
 
 		this.attribute.hp -= hp;
+		
+		if(this.attribute.hp > this.attribute.maxHp){
+			this.attribute.hp = this.attribute.maxHp;
+		}
 
 		this.hpBar.SetHP(this.attribute.hp/this.attribute.maxHp);
 
-		GameObject go = (GameObject)Instantiate(this.hp_pop);
-		HpPop hpPop = go.GetComponent<HpPop>();
-		go.transform.parent = this.transform;
-		go.transform.localPosition = new Vector3(0,0,0);
-		hpPop.SetValue(hp);
+		this.effectObject.PlayNum((int)hp , crit);
 	}
-
-
 	
 	
 	public override void StopMoving(){
@@ -562,7 +587,13 @@ public class Monster : Charactor{
 	}
 
 	public override void PlayDead(){
+		if(this.dead == true){
+			return;
+		}
+
 		this.dead = true;
+
+		if(this.animator != null)this.animator.SetInteger("State" , 0);
 
 		if(this.charModel == null){
 			return;
@@ -570,10 +601,27 @@ public class Monster : Charactor{
 
 		if(this.hpBar != null)Destroy(this.hpBar.gameObject);
 		
-		Battle.RemoveMonster(this);
+		BattleControllor.RemoveMonster(this);
 
 		this.charModel.PlayDead();
+
+		StartCoroutine(Remove()); 
 	}
+
+
+	private IEnumerator Remove(){
+		yield return new WaitForSeconds(1.5f);
+		Destroy(this.gameObject);
+
+		if(this.dropItemId != null){
+
+			if(Random.Range(0 , 10000) < this.dropOdds){
+				BattleControllor.AddItem(this.dropItemId , this.transform.localPosition);
+			}
+		}
+	}
+
+
 
 	public override void SetPlayLock(bool b){
 		if(this.model == null){
@@ -598,7 +646,18 @@ public class Monster : Charactor{
 
 	
 	public override bool IsActive (){
-		return true;
+		return this.dead == false;
+	}
+
+
+	public override void SetSpec(bool b){
+		this.specSign = b;
+
+		if(b){
+			this.charModel.Play();
+		}else{
+			this.charModel.Stop();
+		}
 	}
 }
 

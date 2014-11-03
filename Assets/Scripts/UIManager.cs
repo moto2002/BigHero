@@ -16,10 +16,18 @@ public class UIManager : MonoBehaviour {
 			ui[name] = (GameObject)uilist[i];
 		}
 
-		ShowSingleUI("StartUI");
+		ShowSingleUI("ControllUI");
 		
 		EventDispather.AddEventListener(EventName.UI_SHOW ,OnShowUI);
 		EventDispather.AddEventListener(EventName.UI_SHOW_SINGLE ,OnShowUI);
+
+		SoundManager.PlayMusic(3);
+	}
+
+
+	public void BackToGuan(){
+		HideAll();
+		Application.LoadLevel(1);
 	}
 
 	private void OnShowUI(GameEvent e){

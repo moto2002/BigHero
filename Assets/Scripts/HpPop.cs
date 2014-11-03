@@ -3,30 +3,42 @@ using System.Collections;
 
 public class HpPop : MonoBehaviour {
 
-	private Animator animator;
-
 	public Sprite [] nums;
+
+	private bool crit = false;
+
+	private float liveTime = 0.5f;
 
 	// Use this for initialization
 	void Start () {
-		this.animator = GetComponent<Animator>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if(this.animator == null){
+		liveTime -= Time.deltaTime;
+
+		if(liveTime < 0){
+			Destroy(this.gameObject);
 			return;
 		}
 
-		if(this.animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.6){
-			Destroy(this.gameObject);
+		this.transform.position = this.transform.position + new Vector3(0 , 0.7f * Time.deltaTime, 0);
+
+
+		if(crit == true && liveTime < 0.4f && liveTime > 0.2f){
+			this.transform.localScale = this.transform.localScale + new Vector3(8f * Time.deltaTime , 8f * Time.deltaTime, 0);
 		}
 	}
 
 	public void SetValue(float value){
-		string s = value.ToString();
+
+		value = Mathf.Abs(value);
+
+		string s = ((int)value).ToString();
 		
 		float off = 0;
+
+		ArrayList sps = new ArrayList();
 		
 		for(int i = 0 ; i < s.Length; i++){
 			int k = int.Parse(s[i] + "");
@@ -38,12 +50,24 @@ public class HpPop : MonoBehaviour {
 			SpriteRenderer sp = go.GetComponent<SpriteRenderer>();
 
 			sp.sortingLayerID = 2;
-			
 			sp.sprite = nums[k];
 			
-			go.transform.localPosition = new Vector2(off - 0.2f , 0);
-			
-			off += sp.sprite.bounds.size.x/2 + 0.05f;
+			go.transform.localPosition = new Vector2(off , 0);
+
+			sps.Add(go);
+
+			off += sp.sprite.bounds.size.x/2f + 0.05f;
 		}
+
+
+		for(int i = 0 ; i < sps.Count ; i++){
+			GameObject go = (GameObject)sps[i];
+
+			go.transform.localPosition -= new Vector3(off/2 ,0 , 0);
+		}
+	}
+
+	public void SetCrit(bool crit){
+		this.crit = crit;
 	}
 }

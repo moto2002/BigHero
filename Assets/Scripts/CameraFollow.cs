@@ -19,7 +19,7 @@ public class CameraFollow : MonoBehaviour {
 
 	private void FollowHero(){
 		
-		if(Battle.hero == null){
+		if(BattleControllor.hero == null){
 			return;
 		}
 		
@@ -30,8 +30,8 @@ public class CameraFollow : MonoBehaviour {
 			return;
 		}
 		
-		float x = Battle.hero.transform.position.x;
-		float y = Battle.hero.transform.position.y;
+		float x = BattleControllor.hero.transform.position.x;
+		float y = BattleControllor.hero.transform.position.y;
 
 		if(x < 4 * Constance.GRID_GAP){
 			x = 4 * Constance.GRID_GAP;

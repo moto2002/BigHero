@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Timers;
 
-public class FireWallAttackSkill : Skill {
+public class FireWallAttackSkill {
+	
+	private bool specSign = false;
 	
 	private Charactor attackOne;
 
@@ -48,6 +50,12 @@ public class FireWallAttackSkill : Skill {
 	
 	// Update is called once per frame
 	public void Update () {
+		if(Constance.SPEC_RUNNING == false && Constance.RUNNING == false){
+			return;
+		}else if(Constance.SPEC_RUNNING == true && this.specSign == false){
+			return;
+		}
+
 		if(this.end == true){
 			return;
 		}
@@ -86,7 +94,7 @@ public class FireWallAttackSkill : Skill {
 	private void buildFirewall(){
 		int firewallNum = skillConfig.param1;
 		
-		Vector2 zeroPoint = new Vector2(Random.Range(0,Battle.h) , Random.Range(0,Battle.v));
+		Vector2 zeroPoint = new Vector2(Random.Range(0,BattleControllor.h) , Random.Range(0,BattleControllor.v));
 		
 		ArrayList points = new ArrayList();
 		
@@ -97,7 +105,7 @@ public class FireWallAttackSkill : Skill {
 			for(int i = 1 ; i < firewallNum ; i++){
 				Vector2 point = zeroPoint;
 				
-				if(zeroPoint.y + i > Battle.v){
+				if(zeroPoint.y + i > BattleControllor.v){
 					i = - (firewallNum - i);
 					firewallNum = 0;
 				}
@@ -114,7 +122,7 @@ public class FireWallAttackSkill : Skill {
 			for(int i = 1 ; i < firewallNum ; i++){
 				Vector2 point = zeroPoint;
 				
-				if(zeroPoint.x + i > Battle.h){
+				if(zeroPoint.x + i > BattleControllor.h){
 					i = - (firewallNum - i);
 					firewallNum = 0;
 				}
@@ -150,17 +158,18 @@ public class FireWallAttackSkill : Skill {
 
 			Vector2 v = BattleUtils.PositionToGrid(skillObject.transform.position);
 
-			ArrayList gameObjects = Battle.GetGameObjectsByPosition(v);
+			ArrayList gameObjects = BattleControllor.GetGameObjectsByPosition(v);
 
 			for(int j = 0 ; j < gameObjects.Count; j++){
 
 				Charactor c = (Charactor)gameObjects[j];
 
 				if(c.GetType() !=  this.attackOne.GetType() && c.IsActive() == true){
-
-					float damage = Battle.Attack(attackOne.GetAttribute() , c.GetAttribute());
 					
-					c.ChangeHP(damage);
+					bool crit = BattleControllor.Crit(skillConfig.crit);
+					float damage = BattleControllor.Attack(attackOne.GetAttribute() , c.GetAttribute() , skillConfig.demageratio , skillConfig.b , crit);
+					
+					c.ChangeHP(damage , crit);
 					
 					if(c.GetAttribute().hp > 0){
 						c.PlayAttacked();
@@ -172,6 +181,11 @@ public class FireWallAttackSkill : Skill {
 		}
 	}
 	
+	
+	public void SetSpec(bool b){
+		this.specSign = b;
+	}
+
 	public bool IsEnd(){
 		return end;
 	}

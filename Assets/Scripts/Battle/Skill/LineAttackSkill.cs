@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LineAttackSkill : Skill {
+public class LineAttackSkill {
+	
+	private bool specSign = false;
 	
 	private bool end = false;
 	
@@ -52,6 +54,13 @@ public class LineAttackSkill : Skill {
 	}
 
 	public void Update (){
+		if(Constance.SPEC_RUNNING == false && Constance.RUNNING == false){
+			return;
+		}else if(Constance.SPEC_RUNNING == true && this.specSign == false){
+			return;
+		}
+
+
 		if(end == true){
 			return;
 		}
@@ -81,7 +90,7 @@ public class LineAttackSkill : Skill {
 			skillObject.spriteAnimation.renderer.sortingLayerID = 3;
 			skillObject.transform.position = attackOne.transform.localPosition;
 
-			skillObject.transform.localScale = new Vector2(attribute.volume / 4f , attribute.volume / 4f);
+			skillObject.transform.localScale = new Vector2(skillConfig.range / 16f, attribute.volume / 4f);
 
 			switch(attackOne.GetDirection()){
 			case MoveDirection.DOWN:
@@ -104,16 +113,25 @@ public class LineAttackSkill : Skill {
 			
 			for(int i = 0 ; i < range.Count ; i ++){
 
-				ArrayList objects = Battle.GetGameObjectsByPosition((Vector2)range[i]);
+				ArrayList objects = BattleControllor.GetGameObjectsByPosition((Vector2)range[i]);
 				
 				for(int j = 0 ; j < objects.Count ; j++){
 					Charactor c = objects[j] as Charactor;
 					
 					if(c.GetType() != this.attackOne.GetType() && c.IsActive() == true){
 						
-						float damage = Battle.Attack(attackOne.GetAttribute() , c.GetAttribute());
+						bool crit = BattleControllor.Crit(skillConfig.crit);
+						float damage = BattleControllor.Attack(attackOne.GetAttribute() , c.GetAttribute() , skillConfig.demageratio , skillConfig.b , crit);
 						
-						c.ChangeHP(damage);
+						c.ChangeHP(damage , crit);
+
+//						if(skillConfig.sound2 != 0){
+//							AudioClip ac = Resources.Load<AudioClip>("Audio/Skill/" + skillConfig.sound2);
+//							if(ac != null){
+//								c.audio.clip = ac;
+//								c.audio.Play();
+//							}
+//						}
 						
 						if(c.GetAttribute().hp > 0){
 							c.PlayAttacked();
@@ -141,6 +159,11 @@ public class LineAttackSkill : Skill {
 
 	}
 	
+	
+	public void SetSpec(bool b){
+		this.specSign = b;
+	}
+
 	public bool IsEnd(){
 		return end;
 	}

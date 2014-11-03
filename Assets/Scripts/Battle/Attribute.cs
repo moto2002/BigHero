@@ -14,7 +14,7 @@ public class Attribute  {
 			this._maxHp = value;
 		}
 		get{
-			return this._maxHp + this.addhp * this.level;
+			return this._maxHp + this.addhp * (this.level - 1);
 		}
 	}
 	
@@ -28,7 +28,7 @@ public class Attribute  {
 			this._atk = value;
 		}
 		get{
-			return this._atk + this.addatk * this.level;
+			return this._atk + this.addatk * (this.level - 1);
 		}
 
 	}

@@ -13,7 +13,7 @@ public class Charactor : MonoBehaviour {
 
 	public virtual MoveDirection GetDirection(){return MoveDirection.UP;}
 
-	public virtual void ChangeHP(float hp){}
+	public virtual void ChangeHP(float hp , bool crit){}
 
 	public virtual void StopMoving(){}
 	
@@ -29,6 +29,8 @@ public class Charactor : MonoBehaviour {
 
 	public virtual void SetPlayLock(bool b){}
 
+	public virtual void SetSpec(bool b){}
+
 	public virtual bool IsInAttIndex(){return false;}
 
 	public virtual int GetType(){return TYPE_MONSTER;}
@@ -36,4 +38,6 @@ public class Charactor : MonoBehaviour {
 	public virtual Vector2 GetPoint(){return Vector2.zero;}
 
 	public virtual bool IsActive(){return false;}
+
+	public virtual void PlayEffect(int type){}
 }
